@@ -1,10 +1,20 @@
+import "dotenv/config";
 import typescript from "@rollup/plugin-typescript";
 import copy from "rollup-plugin-copy";
 import terser from "@rollup/plugin-terser";
 
-const SCREEPS_SERVER = process.env.SCREEPS_SERVER ?? "lanstede_nl___21025";
-const SCREEPS_BRANCH = process.env.SCREEPS_BRANCH ?? "default";
-const SCREEPS_DIR = `${process.env.HOME}/Library/Application Support/Screeps/scripts/${SCREEPS_SERVER}/${SCREEPS_BRANCH}`;
+const SCREEPS_SERVER = process.env.SCREEPS_SERVER;
+const SCREEPS_BRANCH = process.env.SCREEPS_BRANCH;
+const SCREEPS_DIR =
+  process.env.SCREEPS_DIR ??
+  `${process.env.HOME}/Library/Application Support/Screeps/scripts/${SCREEPS_SERVER}/${SCREEPS_BRANCH}`;
+
+if ((!SCREEPS_SERVER && !SCREEPS_BRANCH) || !process.env.SCREEPS_DIR) {
+  console.error(
+    "Error: SCREEPS_SERVER and SCREEPS_BRANCH environment variables must be set.",
+  );
+  process.exit(1);
+}
 
 export default {
   input: "src/main.ts",
