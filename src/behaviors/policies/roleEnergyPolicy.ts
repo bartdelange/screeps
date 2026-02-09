@@ -1,4 +1,5 @@
 import { getRoomCreeps } from "../../utils/roomCreeps";
+import type { RoleName } from "../../config";
 import type { EnergyWithdrawPolicy } from "./energyAcquirePolicy";
 import type { EnergyDepositPolicy } from "./energyDepositPolicy";
 
@@ -9,14 +10,47 @@ type RoleEnergyAcquirePolicy = {
 };
 
 const DEFAULT_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
-  excludeLinkRoles: ["source"],
+  excludeLinkRoles: ["source", "hub", "storage", "controller"],
   includeDropped: false,
 };
 
 const MOVER_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
-  ...DEFAULT_WITHDRAW_POLICY,
-  includeDropped: false,
+  excludeLinkRoles: ["source", "hub", "controller"],
+  includeDropped: true,
   preferLinkRoles: ["storage"],
+};
+
+const UPGRADER_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
+  excludeLinkRoles: ["source", "hub", "storage"],
+  includeDropped: false,
+  preferLinkRoles: ["controller"],
+};
+
+const DEFAULT_ACQUIRE_POLICY: RoleEnergyAcquirePolicy = {
+  withdrawPolicy: DEFAULT_WITHDRAW_POLICY,
+  allowHarvest: true,
+  harvestOnlyWhenNoMiners: true,
+};
+
+const ROLE_ACQUIRE_POLICIES: Partial<Record<RoleName, RoleEnergyAcquirePolicy>> = {
+  mover: {
+    withdrawPolicy: MOVER_WITHDRAW_POLICY,
+    allowHarvest: false,
+  },
+  upgrader: {
+    withdrawPolicy: UPGRADER_WITHDRAW_POLICY,
+    allowHarvest: true,
+    harvestOnlyWhenNoMiners: true,
+  },
+  builder: DEFAULT_ACQUIRE_POLICY,
+  harvester: {
+    withdrawPolicy: DEFAULT_WITHDRAW_POLICY,
+    allowHarvest: true,
+  },
+  miner: {
+    withdrawPolicy: DEFAULT_WITHDRAW_POLICY,
+    allowHarvest: true,
+  },
 };
 
 const OPERATIONAL_ENERGY_SINKS: StructureConstant[] = [
@@ -39,34 +73,8 @@ export function getEnergyAcquirePolicyForRole(
   creep: Creep,
 ): RoleEnergyAcquirePolicy {
   const role = creep.memory.role;
-
-  if (role === "mover") {
-    return {
-      withdrawPolicy: MOVER_WITHDRAW_POLICY,
-      allowHarvest: false,
-    };
-  }
-
-  if (role === "builder" || role === "upgrader") {
-    return {
-      withdrawPolicy: DEFAULT_WITHDRAW_POLICY,
-      allowHarvest: true,
-      harvestOnlyWhenNoMiners: true,
-    };
-  }
-
-  if (role === "harvester" || role === "miner") {
-    return {
-      withdrawPolicy: DEFAULT_WITHDRAW_POLICY,
-      allowHarvest: true,
-    };
-  }
-
-  return {
-    withdrawPolicy: DEFAULT_WITHDRAW_POLICY,
-    allowHarvest: true,
-    harvestOnlyWhenNoMiners: true,
-  };
+  if (!role) return DEFAULT_ACQUIRE_POLICY;
+  return ROLE_ACQUIRE_POLICIES[role] ?? DEFAULT_ACQUIRE_POLICY;
 }
 
 export function canHarvestByRolePolicy(
