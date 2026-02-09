@@ -1,4 +1,4 @@
-import type { ActResult } from "./helpers/types";
+import type { ActResult } from "./helpers/core";
 
 export function moveOnto(creep: Creep, pos: RoomPosition): ActResult {
   if (creep.pos.isEqualTo(pos)) return "done";

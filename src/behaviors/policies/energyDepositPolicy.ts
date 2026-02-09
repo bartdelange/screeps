@@ -1,3 +1,5 @@
+import { getEnergyDepositPolicyForRole } from "./roleEnergyPolicy";
+
 export type EnergyDepositPolicy = {
   resource?: ResourceConstant;
   priorityTiers?: StructureConstant[][];
@@ -36,4 +38,13 @@ export function findEnergyDepositTargetWithPolicy(
   }
 
   return null;
+}
+
+export function findBestEnergyDepositTarget(
+  creep: Creep,
+): AnyStoreStructure | null {
+  return findEnergyDepositTargetWithPolicy(
+    creep,
+    getEnergyDepositPolicyForRole(creep),
+  );
 }

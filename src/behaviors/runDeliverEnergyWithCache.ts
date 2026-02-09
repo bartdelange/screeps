@@ -1,4 +1,4 @@
-import { runWithCachedTarget } from "./helpers/runWithCachedTarget";
+import { runWithCachedTarget } from "./helpers/core";
 import { canReceiveResource, transferResource } from "./transferEnergy";
 
 export type DeliverEnergyState = "deliver" | "idle";

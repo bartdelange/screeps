@@ -1,6 +1,5 @@
-import { findBestEnergyDepositTarget } from "../behaviors/findBestEnergyDepositTarget";
-import { findEnergyWithdrawTarget } from "../behaviors/findEnergyWithdrawTarget";
-import { runAcquireEnergyWithCache } from "../behaviors/runAcquireEnergyWithCache";
+import { findBestEnergyDepositTarget } from "../behaviors/policies/energyDepositPolicy";
+import { getEnergyForRole } from "../behaviors/getEnergyForRole";
 import { runDeliverEnergyWithCache } from "../behaviors/runDeliverEnergyWithCache";
 import { updateWorkingState } from "../behaviors/updateWorkingState";
 import { sayState } from "../utils/sayState";
@@ -23,21 +22,9 @@ export function runMover(creep: Creep): void {
 
   const state =
     phase === "gather"
-      ? runAcquireEnergyWithCache(creep, {
-          cache: {
-            getId: (mem) => mem._wId as Id<_HasId> | undefined,
-            setId: (mem, id) => {
-              mem._wId = id;
-            },
-            clearId: (mem) => {
-              delete mem._wId;
-            },
-          },
-          findTarget: findEnergyWithdrawTarget,
+      ? getEnergyForRole(creep, {
           move: { reusePath: 20, maxRooms: 1 },
-        }) === "acquire"
-        ? "withdraw"
-        : "idle"
+        })
       : runDeliverEnergyWithCache(creep, {
           cache: {
             getId: (mem) => mem._dId,

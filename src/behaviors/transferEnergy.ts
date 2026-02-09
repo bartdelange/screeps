@@ -1,5 +1,5 @@
 import { moveWithRecovery } from "./helpers/moveWithRecovery";
-import type { ActResult } from "./helpers/types";
+import type { ActResult } from "./helpers/core";
 
 type TransferOpts = {
   resource?: ResourceConstant;

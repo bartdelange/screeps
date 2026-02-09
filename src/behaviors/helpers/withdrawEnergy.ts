@@ -1,4 +1,4 @@
-import type { ActResult, EnergyWithdrawTarget } from "./types";
+import type { ActResult, EnergyWithdrawTarget } from "./core";
 import { moveWithRecovery } from "./moveWithRecovery";
 import {
   countWithdrawClaimants,

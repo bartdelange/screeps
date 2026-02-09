@@ -1,4 +1,4 @@
-import { findBestEnergyDepositTarget } from "../behaviors/findBestEnergyDepositTarget";
+import { findBestEnergyDepositTarget } from "../behaviors/policies/energyDepositPolicy";
 import { harvestSource } from "../behaviors/harvestSource";
 import { runUpgradeWork } from "../behaviors/runUpgradeWork";
 import { transferEnergy } from "../behaviors/transferEnergy";

@@ -1,6 +1,6 @@
 import { actAtRange } from "../behaviors/actAtRange";
 import { findBestConstructionSite } from "../behaviors/findBestConstructionSite";
-import { getEnergyForAction } from "../behaviors/getEnergyForAction";
+import { getEnergyForRole } from "../behaviors/getEnergyForRole";
 import { runUpgradeWork } from "../behaviors/runUpgradeWork";
 import { updateWorkingState } from "../behaviors/updateWorkingState";
 import { sayState } from "../utils/sayState";
@@ -82,7 +82,7 @@ export function runBuilder(creep: Creep): void {
   const task = selectBuilderTask(creep);
   const state =
     phase === "gather"
-      ? getEnergyForAction(creep, { preferPos: getBuilderPreferPos(task, creep) })
+      ? getEnergyForRole(creep, { preferPos: getBuilderPreferPos(task, creep) })
       : runBuilderWork(creep, task);
 
   sayState(creep, ICONS[state] ?? ICONS.idle);

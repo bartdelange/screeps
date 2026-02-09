@@ -9,8 +9,8 @@ import { pickBestUpgradeCandidate } from "./policies/upgradePlanner";
 import {
   getRequestKeyForCreep,
   getRequestMemoryForKey,
-} from "./helpers/requestKey";
-import { isPlanningActive } from "./helpers/planningState";
+} from "./policies/targets";
+import { isPlanningActive } from "./helpers/planning";
 
 export type PlannedSpawnIntent =
   | {

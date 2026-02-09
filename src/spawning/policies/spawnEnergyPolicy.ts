@@ -1,6 +1,6 @@
 import { ROLE_CONFIG, RoleName } from "../../config";
 import { getTargetForRole } from "./targets";
-import { isPlanningActive } from "../helpers/planningState";
+import { isPlanningActive } from "../helpers/planning";
 import { getRoomCreeps } from "../../utils/roomCreeps";
 
 export function countRoleInRoom(room: Room, role: RoleName): number {

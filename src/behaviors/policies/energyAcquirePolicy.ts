@@ -1,5 +1,5 @@
 import { getLinkRole, type LinkRole } from "../../links/policies/getLinkRole";
-import type { EnergyWithdrawTarget } from "../helpers/types";
+import type { EnergyWithdrawTarget } from "../helpers/core";
 
 export type EnergyWithdrawPolicy = {
   includeDropped?: boolean;
@@ -122,4 +122,14 @@ export function findEnergyWithdrawTargetWithPolicy(
     .sort((a, b) => a.score - b.score);
 
   return scored[0]?.target ?? null;
+}
+
+export function findEnergyWithdrawTarget(
+  creep: Creep,
+  opts: EnergyWithdrawPolicy = {},
+): EnergyWithdrawTarget | null {
+  return findEnergyWithdrawTargetWithPolicy(creep, {
+    excludeLinkRoles: ["source"],
+    ...opts,
+  });
 }

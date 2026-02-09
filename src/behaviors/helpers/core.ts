@@ -1,3 +1,9 @@
+export type ActResult = "done" | "not_found" | "not_in_range" | "blocked";
+
+export type EnergyWithdrawTarget =
+  | AnyStoreStructure
+  | Resource<RESOURCE_ENERGY>;
+
 type CachedTargetAccess = {
   getId: (mem: CreepMemory) => Id<any> | undefined;
   setId: (mem: CreepMemory, id: Id<any>) => void;

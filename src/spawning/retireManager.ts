@@ -1,7 +1,10 @@
 import { ROLE_CONFIG, ROLE_PRIORITY, RoleName } from "../config";
-import { getRequestKeyForCreep } from "./helpers/requestKey";
 import { getRoomPlanCached } from "./helpers/planAccess";
-import { getTargetForRole, getRequestedKeysForRole } from "./policies/targets";
+import {
+  getRequestKeyForCreep,
+  getRequestedKeysForRole,
+  getTargetForRole,
+} from "./policies/targets";
 import { markRetire } from "../utils/markRetire";
 
 const NEAR_DEATH_TTL = 50;
