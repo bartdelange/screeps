@@ -1,4 +1,4 @@
-import { findSourceContainer } from "../behaviors/findSourceContainer";
+import { findSourceStorageUnit } from "../behaviors/findSourceStorageUnit";
 import { moveOnto } from "../behaviors/moveOnto";
 import { harvestSource } from "../behaviors/harvestSource";
 import { sayState } from "../utils/sayState";
@@ -27,13 +27,13 @@ export function runMiner(creep: Creep): void {
     return;
   }
 
-  const container = findSourceContainer(source, creep);
-  if (!container) {
+  const storageUnit = findSourceStorageUnit(source, creep);
+  if (!storageUnit) {
     sayState(creep, ICONS.noContainer);
     return;
   }
 
-  const moveRes = moveOnto(creep, container.pos);
+  const moveRes = moveOnto(creep, storageUnit.pos);
   if (moveRes !== "done") {
     sayState(creep, ICONS.moving);
     return;

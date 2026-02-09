@@ -4,6 +4,7 @@ import {
 } from "./helpers/getEnergyForAction";
 import { runAcquireEnergyWithCache } from "./helpers/runAcquireEnergyWithCache";
 import { findEnergyWithdrawTarget } from "./policies/energyAcquirePolicy";
+import { findBestEnergyDepositTarget } from "./policies/energyDepositPolicy";
 import { getEnergyAcquirePolicyForRole } from "./policies/roleEnergyPolicy";
 
 type GetEnergyForRoleOpts = {
@@ -16,6 +17,12 @@ export function getEnergyForRole(
   opts: GetEnergyForRoleOpts = {},
 ): GetEnergyResult {
   if (creep.memory.role === "mover") {
+    const demandTarget = findBestEnergyDepositTarget(creep);
+    if (!demandTarget || demandTarget.structureType === STRUCTURE_STORAGE) {
+      delete creep.memory._wId;
+      return "idle";
+    }
+
     const state = runAcquireEnergyWithCache(creep, {
       cache: {
         getId: (mem) => mem._wId as Id<_HasId> | undefined,

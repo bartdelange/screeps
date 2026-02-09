@@ -1,5 +1,8 @@
 import { basePriority } from "./behaviors/policies/constructionSitePolicy";
-import { containersReady, getSourcesWithContainer } from "./utils/containersReady";
+import {
+  containersReady,
+  getSourcesWithContainer,
+} from "./utils/containersReady";
 import { repairsNeeded } from "./utils/repairsNeeded";
 import { getRoomCreeps } from "./utils/roomCreeps";
 
@@ -144,10 +147,10 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
 
         if (valuableSites > 10) return 6;
         if (valuableSites > 5) return 4;
-        if (valuableSites > 0) return 2;
-        if (needsContainers) return 1;
-        if (needsRepairs) return 1;
-        return 0;
+        if (valuableSites > 0) return 3;
+        if (needsContainers) return 2;
+        if (needsRepairs) return 2;
+        return 1; // Always have at least one builder that can repair or upgrade
       },
     },
   },

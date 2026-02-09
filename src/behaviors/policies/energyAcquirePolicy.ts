@@ -9,6 +9,7 @@ export type EnergyWithdrawPolicy = {
   maxPreferRange?: number;
   preferOnly?: boolean;
   excludeLinkRoles?: LinkRole[];
+  preferLinkRoles?: LinkRole[];
 };
 
 const DEFAULT_STRUCTURES: StructureConstant[] = [
@@ -83,11 +84,27 @@ function isAllowedStructure(
   return true;
 }
 
-function scoreStoreTarget(creep: Creep, target: AnyStoreStructure): number {
+function scoreStoreTarget(
+  creep: Creep,
+  target: AnyStoreStructure,
+  policy: EnergyWithdrawPolicy,
+): number {
   const distance = creep.pos.getRangeTo(target);
   const claimants = countWithdrawClaimants(creep.room, target.id);
   const energy = target.store.getUsedCapacity(RESOURCE_ENERGY);
-  return distance + claimants * 5 - Math.min(10, energy / 200);
+  let score = distance + claimants * 5 - Math.min(10, energy / 200);
+
+  if (
+    target.structureType === STRUCTURE_LINK &&
+    (policy.preferLinkRoles?.length ?? 0) > 0
+  ) {
+    const role = getLinkRole(target as StructureLink);
+    if (role && policy.preferLinkRoles!.includes(role)) {
+      score -= 100;
+    }
+  }
+
+  return score;
 }
 
 function findDropped(
@@ -118,7 +135,7 @@ export function findEnergyWithdrawTargetWithPolicy(
   if (stores.length === 0) return null;
 
   const scored = stores
-    .map((s) => ({ target: s, score: scoreStoreTarget(creep, s) }))
+    .map((s) => ({ target: s, score: scoreStoreTarget(creep, s, policy) }))
     .sort((a, b) => a.score - b.score);
 
   return scored[0]?.target ?? null;
