@@ -1,5 +1,6 @@
-import { moveWithRecovery } from "./moveWithRecovery";
-import type { EnergyWithdrawTarget } from "./types";
+import { moveWithRecovery } from "./helpers/moveWithRecovery";
+import type { EnergyWithdrawTarget } from "./helpers/types";
+import { hasEnergy, isDroppedEnergy } from "./policies/energyAcquirePolicy";
 
 export type AcquireEnergyState = "acquire" | "idle";
 
@@ -18,21 +19,6 @@ type RunAcquireEnergyWithCacheOpts = {
 function getById<T extends _HasId>(id: Id<T> | undefined): T | null {
   if (!id) return null;
   return Game.getObjectById(id);
-}
-
-function isDroppedEnergy(
-  target: EnergyWithdrawTarget,
-): target is Resource<RESOURCE_ENERGY> {
-  return (
-    (target as any).resourceType === RESOURCE_ENERGY &&
-    typeof (target as any).amount === "number"
-  );
-}
-
-function hasEnergy(source: EnergyWithdrawTarget): boolean {
-  return isDroppedEnergy(source)
-    ? source.amount > 0
-    : source.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
 }
 
 export function runAcquireEnergyWithCache(

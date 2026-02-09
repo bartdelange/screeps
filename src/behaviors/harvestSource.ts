@@ -1,4 +1,4 @@
-import type { ActResult } from "./types";
+import type { ActResult } from "./helpers/types";
 import { getReservedSourceIds } from "../utils/reservedSources";
 
 export function harvestSource(creep: Creep, source: Source): ActResult {

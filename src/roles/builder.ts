@@ -14,74 +14,76 @@ const ICONS: Record<string, string> = {
   idle: "😴",
 };
 
-function findDamagedContainer(creep: Creep): StructureContainer | null {
-  return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+type BuilderTask =
+  | { kind: "repair"; target: StructureContainer | StructureRoad }
+  | { kind: "build"; target: ConstructionSite }
+  | { kind: "upgrade"; target: StructureController }
+  | { kind: "idle" };
+
+function selectBuilderTask(creep: Creep): BuilderTask {
+  const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
     filter: (s): s is StructureContainer =>
       s.structureType === STRUCTURE_CONTAINER && s.hits < s.hitsMax * 0.9,
   });
-}
+  if (container) return { kind: "repair", target: container };
 
-function findDamagedRoad(creep: Creep): StructureRoad | null {
-  return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+  const road = creep.pos.findClosestByPath(FIND_STRUCTURES, {
     filter: (s): s is StructureRoad =>
       s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax * 0.4,
   });
-}
+  if (road) return { kind: "repair", target: road };
 
-function findSite(creep: Creep): ConstructionSite | null {
-  return findBestConstructionSite(creep, {
+  const site = findBestConstructionSite(creep, {
     preferJoinWithin: 20,
     desiredMaxJoiners: 2,
   });
+  if (site) return { kind: "build", target: site };
+
+  const controller = creep.room.controller;
+  if (controller) return { kind: "upgrade", target: controller };
+
+  return { kind: "idle" };
 }
 
-function getBuilderPreferPos(creep: Creep): RoomPosition {
-  const container = findDamagedContainer(creep);
-  if (container) return container.pos;
-
-  const road = findDamagedRoad(creep);
-  if (road) return road.pos;
-
-  const site = findSite(creep);
-  if (site) return site.pos;
-
-  return creep.room.controller?.pos ?? creep.pos;
+function getBuilderPreferPos(task: BuilderTask, creep: Creep): RoomPosition {
+  if (task.kind === "idle") return creep.pos;
+  return task.target.pos;
 }
 
-function runBuilderWork(creep: Creep): "repair" | "build" | "upgrade" | "idle" {
-  const container = findDamagedContainer(creep);
-  if (container) {
-    actAtRange(creep, container, () => creep.repair(container), {
+function runBuilderWork(
+  creep: Creep,
+  task: BuilderTask,
+): "repair" | "build" | "upgrade" | "idle" {
+  if (task.kind === "repair") {
+    const structure = task.target;
+    actAtRange(creep, structure, () => creep.repair(structure), {
       move: { reusePath: 25 },
     });
     return "repair";
   }
 
-  const road = findDamagedRoad(creep);
-  if (road) {
-    actAtRange(creep, road, () => creep.repair(road), {
-      move: { reusePath: 25 },
-    });
-    return "repair";
-  }
-
-  const site = findSite(creep);
-  if (site) {
+  if (task.kind === "build") {
+    const site = task.target;
     actAtRange(creep, site, () => creep.build(site), {
       move: { reusePath: 25 },
     });
     return "build";
   }
 
-  return runUpgradeWork(creep);
+  if (task.kind === "upgrade") {
+    return runUpgradeWork(creep, { controller: task.target });
+  }
+
+  return "idle";
 }
 
 export function runBuilder(creep: Creep): void {
   const phase = updateWorkingState(creep);
+  const task = selectBuilderTask(creep);
   const state =
     phase === "gather"
-      ? getEnergyForAction(creep, { preferPos: getBuilderPreferPos(creep) })
-      : runBuilderWork(creep);
+      ? getEnergyForAction(creep, { preferPos: getBuilderPreferPos(task, creep) })
+      : runBuilderWork(creep, task);
 
   sayState(creep, ICONS[state] ?? ICONS.idle);
 }

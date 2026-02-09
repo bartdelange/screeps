@@ -1,4 +1,4 @@
-import type { ActResult } from "./types";
+import type { ActResult } from "./helpers/types";
 
 type ActionTarget = {
   pos: RoomPosition;

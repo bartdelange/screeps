@@ -1,6 +1,6 @@
-import { withdrawEnergy } from "./withdrawEnergy";
-import { harvestSource } from "./harvestSource";
 import { findEnergyWithdrawTarget } from "./findEnergyWithdrawTarget";
+import { harvestSource } from "./harvestSource";
+import { withdrawEnergy } from "./helpers/withdrawEnergy";
 
 export type GetEnergyOpts = {
   preferPos: RoomPosition;
@@ -9,20 +9,6 @@ export type GetEnergyOpts = {
 };
 
 export type GetEnergyResult = "harvest" | "withdraw" | "idle";
-
-function findWithdrawNear(
-  creep: Creep,
-  preferPos: RoomPosition,
-  maxRange: number,
-): AnyStoreStructure | null {
-  return creep.pos.findClosestByPath(FIND_STRUCTURES, {
-    filter: (s) =>
-      (s.structureType === STRUCTURE_CONTAINER ||
-        s.structureType === STRUCTURE_STORAGE) &&
-      (s as AnyStoreStructure).store.getUsedCapacity(RESOURCE_ENERGY) > 0 &&
-      preferPos.getRangeTo(s.pos) <= maxRange,
-  }) as AnyStoreStructure | null;
-}
 
 export function getEnergyForAction(
   creep: Creep,
@@ -45,7 +31,12 @@ export function getEnergyForAction(
     }
   }
 
-  const nearWorkStore = findWithdrawNear(creep, opts.preferPos, withdrawWithin);
+  const nearWorkStore = findEnergyWithdrawTarget(creep, {
+    includeDropped: false,
+    preferPos: opts.preferPos,
+    maxPreferRange: withdrawWithin,
+    preferOnly: true,
+  });
   if (nearWorkStore) {
     withdrawEnergy(creep, nearWorkStore);
     return "withdraw";

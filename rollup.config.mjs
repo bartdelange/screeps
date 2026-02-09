@@ -39,10 +39,7 @@ export default {
     }),
 
     copy({
-      targets: [
-        { src: "dist/main.js", dest: SCREEPS_DIR },
-        { src: "dist/main.js.map", dest: SCREEPS_DIR },
-      ],
+      targets: [{ src: "dist/main.js", dest: SCREEPS_DIR }],
       hook: "writeBundle",
       copyOnce: false,
     }),

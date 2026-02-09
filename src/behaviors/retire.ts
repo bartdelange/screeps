@@ -1,5 +1,5 @@
-import { findSpawnOrExtensionNeedingEnergy } from "./findSpawnOrExtensionNeedingEnergy";
-import { findEnergyDepositTarget } from "./findEnergyDepositTarget";
+import { findSpawnOrExtensionNeedingEnergy } from "./helpers/findSpawnOrExtensionNeedingEnergy";
+import { findEnergyDepositTarget } from "./helpers/findEnergyDepositTarget";
 import { transferEnergy } from "./transferEnergy";
 import { sayState } from "../utils/sayState";
 
