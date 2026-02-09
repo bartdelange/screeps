@@ -1,4 +1,4 @@
-import { findBestEnergyDepositTarget } from "../behaviors/policies/energyDepositPolicy";
+import { findEnergyDepositTarget } from "../behaviors/policies/energyDepositPolicy";
 import { harvestSource } from "../behaviors/harvestSource";
 import { runUpgradeWork } from "../behaviors/runUpgradeWork";
 import { transferEnergy } from "../behaviors/transferEnergy";
@@ -20,7 +20,7 @@ export function runHarvester(creep: Creep): void {
     return;
   }
 
-  const target = findBestEnergyDepositTarget(creep);
+  const target = findEnergyDepositTarget(creep);
   const deliverState: "deliver" | "idle" = target ? "deliver" : "idle";
   if (target) transferEnergy(creep, target);
   if (deliverState === "deliver") {

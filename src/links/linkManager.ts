@@ -5,6 +5,10 @@ export function runLinks(): void {
     if (!room.controller?.my) continue;
     const { source, hub, controller, storage } = getRoomLinks(room);
 
+    // console.log(
+    //   `Room ${room.name} has ${source.length} source links, ${hub.length} hub links, ${controller.length} controller links, and ${storage.length} storage links.`,
+    // );
+
     const sinks = [...controller, ...storage].filter(
       (l) => l.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
     );

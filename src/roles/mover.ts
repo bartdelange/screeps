@@ -1,4 +1,4 @@
-import { findBestEnergyDepositTarget } from "../behaviors/policies/energyDepositPolicy";
+import { findEnergyDepositTarget } from "../behaviors/policies/energyDepositPolicy";
 import { getEnergyForRole } from "../behaviors/getEnergyForRole";
 import { runDeliverEnergyWithCache } from "../behaviors/runDeliverEnergyWithCache";
 import { updateWorkingState } from "../behaviors/updateWorkingState";
@@ -20,6 +20,21 @@ export function runMover(creep: Creep): void {
     },
   });
 
+  if (phase === "work" && creep.memory._dId) {
+    const bestNow =
+      findEnergyDepositTarget(creep, { excludeTypes: [STRUCTURE_STORAGE] }) ??
+      findEnergyDepositTarget(creep);
+    const cached = Game.getObjectById(creep.memory._dId);
+    if (
+      cached &&
+      cached.structureType === STRUCTURE_STORAGE &&
+      bestNow &&
+      bestNow.structureType !== STRUCTURE_STORAGE
+    ) {
+      delete creep.memory._dId;
+    }
+  }
+
   const state =
     phase === "gather"
       ? getEnergyForRole(creep, {
@@ -35,7 +50,12 @@ export function runMover(creep: Creep): void {
               delete mem._dId;
             },
           },
-          findTarget: findBestEnergyDepositTarget,
+          findTarget: (c) => {
+            return (
+              findEnergyDepositTarget(c, { excludeTypes: [STRUCTURE_STORAGE] }) ??
+              findEnergyDepositTarget(c)
+            );
+          },
           move: { reusePath: 20, maxRooms: 1 },
           resource: RESOURCE_ENERGY,
         });

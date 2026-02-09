@@ -1,9 +1,9 @@
-import { findEnergyDepositTargetWithPolicy } from "../policies/energyDepositPolicy";
+import { findEnergyDepositTarget } from "../policies/energyDepositPolicy";
 
 export function findSpawnOrExtensionNeedingEnergy(
   creep: Creep,
 ): AnyStoreStructure | null {
-  return findEnergyDepositTargetWithPolicy(creep, {
-    priorityTiers: [[STRUCTURE_SPAWN, STRUCTURE_EXTENSION]],
+  return findEnergyDepositTarget(creep, {
+    includeTypes: [STRUCTURE_SPAWN, STRUCTURE_EXTENSION],
   });
 }

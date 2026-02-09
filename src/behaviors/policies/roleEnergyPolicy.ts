@@ -15,6 +15,7 @@ const DEFAULT_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
 };
 
 const MOVER_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
+  includeStructures: [STRUCTURE_CONTAINER, STRUCTURE_LINK],
   excludeLinkRoles: ["source", "hub", "controller"],
   includeDropped: true,
   preferLinkRoles: ["storage"],
@@ -32,7 +33,9 @@ const DEFAULT_ACQUIRE_POLICY: RoleEnergyAcquirePolicy = {
   harvestOnlyWhenNoMiners: true,
 };
 
-const ROLE_ACQUIRE_POLICIES: Partial<Record<RoleName, RoleEnergyAcquirePolicy>> = {
+const ROLE_ACQUIRE_POLICIES: Partial<
+  Record<RoleName, RoleEnergyAcquirePolicy>
+> = {
   mover: {
     withdrawPolicy: MOVER_WITHDRAW_POLICY,
     allowHarvest: false,
@@ -84,38 +87,29 @@ export function canHarvestByRolePolicy(
   if (!policy.allowHarvest) return false;
   if (!policy.harvestOnlyWhenNoMiners) return true;
 
-  return getRoomCreeps(creep.room, {
-    role: "miner",
-    includeRetiring: false,
-  }).length === 0;
+  return (
+    getRoomCreeps(creep.room, {
+      role: "miner",
+      includeRetiring: false,
+    }).length === 0
+  );
 }
 
 function getMoverDepositPolicy(creep: Creep): EnergyDepositPolicy {
-  const room = creep.room;
-  const criticalSpawnEnergy = Math.min(300, room.energyCapacityAvailable);
-  const isLowEnergyForSpawning = room.energyAvailable < criticalSpawnEnergy;
-
-  if (isLowEnergyForSpawning) {
-    return {
-      priorityTiers: [
-        [STRUCTURE_SPAWN, STRUCTURE_EXTENSION],
-        OPERATIONAL_ENERGY_SINKS,
-        [STRUCTURE_STORAGE],
-      ],
-    };
-  }
-
   return {
     priorityTiers: [
-      [STRUCTURE_SPAWN],
+      [STRUCTURE_SPAWN, STRUCTURE_EXTENSION],
       OPERATIONAL_ENERGY_SINKS,
-      [STRUCTURE_EXTENSION],
+      [STRUCTURE_LINK],
       [STRUCTURE_STORAGE],
     ],
+    includeLinkRoles: ["source"],
   };
 }
 
-export function getEnergyDepositPolicyForRole(creep: Creep): EnergyDepositPolicy {
+export function getEnergyDepositPolicyForRole(
+  creep: Creep,
+): EnergyDepositPolicy {
   if (creep.memory.role === "mover") return getMoverDepositPolicy(creep);
 
   return DEFAULT_DEPOSIT_POLICY;
