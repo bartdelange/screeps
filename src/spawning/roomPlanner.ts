@@ -50,7 +50,8 @@ function hasRequestedCreep(room: Room, role: RoleName, key: string): boolean {
     if (c.memory.role !== role) continue;
     if (!isPlanningActive(c)) continue;
 
-    if (role === "miner" && c.memory.sourceId === key) return true;
+    const creepKey = getRequestKeyForCreep(role, c);
+    if (creepKey === key) return true;
   }
   return false;
 }

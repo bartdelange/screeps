@@ -7,20 +7,21 @@ export function getGraveyardPos(creep: Creep): RoomPosition | null {
   const flag = Game.flags["Graveyard"];
   if (!flag) return null;
 
-  const candidates =
-    flag.pos.getRangeTo(creep.pos) === 0
-      ? [flag.pos]
-      : creep.room
-          .lookForAtArea(
-            LOOK_TERRAIN,
-            Math.max(0, flag.pos.y - 1),
-            Math.max(0, flag.pos.x - 1),
-            Math.min(49, flag.pos.y + 1),
-            Math.min(49, flag.pos.x + 1),
-            true,
-          )
-          .filter((t) => t.terrain !== "wall")
-          .map((t) => new RoomPosition(t.x, t.y, flag.pos.roomName));
+  // When the flag is in another room, path toward it directly.
+  if (flag.pos.roomName !== creep.room.name) return flag.pos;
+
+  const terrain = creep.room.getTerrain();
+  const candidates: RoomPosition[] = [];
+
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const x = flag.pos.x + dx;
+      const y = flag.pos.y + dy;
+      if (x < 0 || x > 49 || y < 0 || y > 49) continue;
+      if (terrain.get(x, y) === TERRAIN_MASK_WALL) continue;
+      candidates.push(new RoomPosition(x, y, flag.pos.roomName));
+    }
+  }
 
   return creep.pos.findClosestByRange(candidates) ?? flag.pos;
 }

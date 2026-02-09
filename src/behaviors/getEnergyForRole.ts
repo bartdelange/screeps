@@ -6,6 +6,7 @@ import { runAcquireEnergyWithCache } from "./helpers/runAcquireEnergyWithCache";
 import { findEnergyWithdrawTarget } from "./policies/energyAcquirePolicy";
 import { findEnergyDepositTarget } from "./policies/energyDepositPolicy";
 import { getEnergyAcquirePolicyForRole } from "./policies/roleEnergyPolicy";
+import { findSourceStorageUnit } from "./findSourceStorageUnit";
 
 type GetEnergyForRoleOpts = {
   preferPos?: RoomPosition;
@@ -33,8 +34,26 @@ export function getEnergyForRole(
           delete mem._wId;
         },
       },
-      findTarget: (c) =>
-        findEnergyWithdrawTarget(c, getEnergyAcquirePolicyForRole(c).withdrawPolicy),
+      findTarget: (c) => {
+        const assignedSourceId = c.memory.moverSourceId as Id<Source> | undefined;
+        if (assignedSourceId) {
+          const source = Game.getObjectById(assignedSourceId);
+          if (source) {
+            const assignedStorage = findSourceStorageUnit(source, c);
+            if (
+              assignedStorage &&
+              assignedStorage.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+            ) {
+              return assignedStorage;
+            }
+          }
+        }
+
+        return findEnergyWithdrawTarget(
+          c,
+          getEnergyAcquirePolicyForRole(c).withdrawPolicy,
+        );
+      },
       move: opts.move,
     });
     return state === "acquire" ? "withdraw" : "idle";

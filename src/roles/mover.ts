@@ -3,6 +3,8 @@ import { getEnergyForRole } from "../behaviors/getEnergyForRole";
 import { runDeliverEnergyWithCache } from "../behaviors/runDeliverEnergyWithCache";
 import { updateWorkingState } from "../behaviors/updateWorkingState";
 import { sayState } from "../utils/sayState";
+import { getRoomCreeps } from "../utils/roomCreeps";
+import { getSourcesWithContainer } from "../utils/containersReady";
 
 const ICONS: Record<string, string> = {
   withdraw: "📦",
@@ -10,7 +12,56 @@ const ICONS: Record<string, string> = {
   idle: "😴",
 };
 
+function getMoverSlotIndex(creep: Creep): number {
+  const key = creep.memory.moverRequestKey;
+  if (!key) return 0;
+
+  if (key.startsWith("slot:")) {
+    const n = Number(key.slice("slot:".length));
+    return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+  }
+
+  const splitAt = key.lastIndexOf(":");
+  if (splitAt < 0) return 0;
+  const n = Number(key.slice(splitAt + 1));
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+}
+
+function updateMoverBinding(creep: Creep): void {
+  const sourcesWithContainer = getSourcesWithContainer(creep.room);
+  if (sourcesWithContainer.length === 0) {
+    delete creep.memory.moverSourceId;
+    return;
+  }
+
+  const availableSourceIds = new Set(sourcesWithContainer.map((s) => s.id));
+  const activeMinerSourceIds = [
+    ...new Set(
+      getRoomCreeps(creep.room, {
+        role: "miner",
+        includeRetiring: false,
+        predicate: (c) => typeof c.memory.sourceId === "string",
+      }).map((c) => c.memory.sourceId as Id<Source>),
+    ),
+  ].filter((id) => availableSourceIds.has(id));
+
+  const assignmentPool =
+    activeMinerSourceIds.length > 0
+      ? activeMinerSourceIds
+      : sourcesWithContainer.map((s) => s.id);
+  if (assignmentPool.length === 0) {
+    delete creep.memory.moverSourceId;
+    return;
+  }
+
+  const slotIndex = getMoverSlotIndex(creep);
+  const targetSourceId = assignmentPool[slotIndex % assignmentPool.length];
+  creep.memory.moverSourceId = targetSourceId;
+}
+
 export function runMover(creep: Creep): void {
+  updateMoverBinding(creep);
+
   const phase = updateWorkingState(creep, {
     onStartWorking: () => {
       delete creep.memory._wId;

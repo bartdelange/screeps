@@ -1,13 +1,15 @@
 import { cleanupCreepMemory } from "./utils/memory";
-import { runPlanManager } from "./spawning/planManager";
-import { runSpawnManager } from "./spawning/spawnManager";
-import { runRetireManager } from "./spawning/retireManager";
 import { roleRunners } from "./roles";
 import { RoleName } from "./config";
 import { runInvalidCreep } from "./behaviors/invalid";
 import { reportStatsEvery, updateTelemetry } from "./telemetry/stats";
+
+import { runPlanManager } from "./spawning/planManager";
+import { runSpawnManager } from "./spawning/spawnManager";
+import { runRetireManager } from "./spawning/retireManager";
 import { runRetire } from "./behaviors/retire";
 import { runLinks } from "./links/linkManager";
+import { runTowers } from "./towers/towerManager";
 
 export const loop = (): void => {
   cleanupCreepMemory();
@@ -20,6 +22,7 @@ export const loop = (): void => {
   reportStatsEvery(25);
 
   runLinks();
+  runTowers();
 
   for (const name in Game.creeps) {
     const creep = Game.creeps[name];

@@ -37,6 +37,52 @@ export type RoleSpec = {
   spawn: SpawnPlan;
 };
 
+function getBuilderUpgraderTargets(room: Room): {
+  builder: number;
+  upgrader: number;
+} {
+  const cap = room.energyCapacityAvailable;
+  const valuableSites = room
+    .find(FIND_CONSTRUCTION_SITES)
+    .filter((site) => basePriority(site) >= 250).length;
+  const needsContainers = !containersReady(room);
+  const needsRepairs = repairsNeeded(room, {
+    containerBelow: 0.9,
+    roadBelow: 0.4,
+    minMissingHits: 5000,
+    minTargets: 1,
+  });
+
+  type WorkTier = "none" | "light" | "medium" | "high";
+  const workTier: WorkTier =
+    valuableSites > 10
+      ? "high"
+      : valuableSites > 5
+        ? "medium"
+        : valuableSites > 0 || needsContainers || needsRepairs
+          ? "light"
+          : "none";
+
+  if (cap >= 800) {
+    if (workTier === "high") return { builder: 5, upgrader: 1 };
+    if (workTier === "medium") return { builder: 4, upgrader: 2 };
+    if (workTier === "light") return { builder: 3, upgrader: 3 };
+    return { builder: 1, upgrader: 6 };
+  }
+
+  if (cap >= 550) {
+    if (workTier === "high") return { builder: 4, upgrader: 1 };
+    if (workTier === "medium") return { builder: 3, upgrader: 2 };
+    if (workTier === "light") return { builder: 2, upgrader: 2 };
+    return { builder: 1, upgrader: 4 };
+  }
+
+  if (workTier === "high") return { builder: 3, upgrader: 1 };
+  if (workTier === "medium") return { builder: 2, upgrader: 1 };
+  if (workTier === "light") return { builder: 2, upgrader: 1 };
+  return { builder: 1, upgrader: 3 };
+}
+
 export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
   harvester: {
     minEnergy: 200,
@@ -76,30 +122,7 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
       desired: (room) => {
         const ctrl = room.controller;
         if (!ctrl) return 0;
-
-        if (ctrl.level >= 6) return 2;
-
-        const sites = room.find(FIND_CONSTRUCTION_SITES).length;
-        const hasUrgentWork =
-          sites > 0 ||
-          repairsNeeded(room, {
-            containerBelow: 0.9,
-            roadBelow: 0.4,
-            minMissingHits: 5000,
-            minTargets: 1,
-          });
-
-        const cap = room.energyCapacityAvailable;
-
-        if (hasUrgentWork) {
-          if (cap >= 800) return 3;
-          if (cap >= 550) return 2;
-          return 1;
-        }
-
-        if (cap >= 800) return 6;
-        if (cap >= 550) return 4;
-        return 3;
+        return getBuilderUpgraderTargets(room).upgrader;
       },
     },
   },
@@ -132,26 +155,7 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
     },
     memory: (role) => ({ role, working: false, retire: false }),
     spawn: {
-      desired: (room) => {
-        const valuableSites = room
-          .find(FIND_CONSTRUCTION_SITES)
-          .filter((site) => basePriority(site) >= 250).length;
-        const needsContainers = !containersReady(room);
-
-        const needsRepairs = repairsNeeded(room, {
-          containerBelow: 0.9,
-          roadBelow: 0.4,
-          minMissingHits: 5000,
-          minTargets: 1,
-        });
-
-        if (valuableSites > 10) return 6;
-        if (valuableSites > 5) return 4;
-        if (valuableSites > 0) return 3;
-        if (needsContainers) return 2;
-        if (needsRepairs) return 2;
-        return 1; // Always have at least one builder that can repair or upgrade
-      },
+      desired: (room) => getBuilderUpgraderTargets(room).builder,
     },
   },
 
@@ -215,28 +219,48 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
     },
     memory: (role) => ({ role, working: false, retire: false }),
     spawn: {
-      desired: (room) => {
+      desired: (_room) => 0,
+      requests: (room) => {
         const sourcesWithContainer = getSourcesWithContainer(room);
-
-        if (sourcesWithContainer.length === 0) return 0;
-
-        const activeMiners = getRoomCreeps(room, {
-          role: "miner",
-          includeRetiring: false,
-          predicate: (c) => typeof c.memory.sourceId === "string",
-        });
-
-        const activeMinerSourceIds = new Set(
-          activeMiners.map((m) => m.memory.sourceId),
-        );
-        const activePipelines = sourcesWithContainer.filter((s) =>
-          activeMinerSourceIds.has(s.id),
-        ).length;
-
-        if (activePipelines === 0) return 0;
+        if (sourcesWithContainer.length === 0) return [];
 
         const maxMovers = (room.controller?.level ?? 1) >= 3 ? 2 : 1;
-        return Math.min(maxMovers, activePipelines);
+        const desiredMovers = Math.min(maxMovers, sourcesWithContainer.length);
+        if (desiredMovers === 0) return [];
+
+        const availableSourceIds = new Set(sourcesWithContainer.map((s) => s.id));
+        const activeMinerSourceIds = [
+          ...new Set(
+            getRoomCreeps(room, {
+              role: "miner",
+              includeRetiring: false,
+              predicate: (c) => typeof c.memory.sourceId === "string",
+            }).map((c) => c.memory.sourceId as Id<Source>),
+          ),
+        ].filter((id) => availableSourceIds.has(id));
+
+        const assignmentPool =
+          activeMinerSourceIds.length > 0
+            ? activeMinerSourceIds
+            : sourcesWithContainer.map((s) => s.id);
+        const sourceIndexById = new Map(
+          sourcesWithContainer.map((s, i) => [s.id, i] as const),
+        );
+
+        return Array.from({ length: desiredMovers }, (_, i) => {
+          const sourceId = assignmentPool[i % assignmentPool.length];
+          const key = `slot:${i}`;
+          const sourceIndex = sourceIndexById.get(sourceId) ?? i;
+
+          return {
+            key,
+            nameHint: `src${sourceIndex}`,
+            memory: {
+              moverSourceId: sourceId,
+              moverRequestKey: key,
+            },
+          };
+        });
       },
     },
   },

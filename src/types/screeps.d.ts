@@ -52,6 +52,8 @@ declare global {
     retireMarkedAt?: number;
 
     sourceId?: Id<Source>;
+    moverSourceId?: Id<Source>;
+    moverRequestKey?: string;
     buildTargetId?: Id<ConstructionSite>;
 
     _wId?: Id<_HasId>;
