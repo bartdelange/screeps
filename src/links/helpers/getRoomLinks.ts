@@ -1,4 +1,4 @@
-import { getLinkRole, LinkRole } from "./getLinkRole";
+import { getLinkRole, LinkRole } from "../policies/getLinkRole";
 
 export function getRoomLinks(room: Room) {
   const links = room.find(FIND_MY_STRUCTURES, {

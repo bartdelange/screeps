@@ -1,4 +1,4 @@
-import { ROLE_PRIORITY, RoleName } from "../config";
+import { ROLE_PRIORITY, RoleName } from "../../config";
 import {
   countRoleInRoom,
   getCreepSpawnCost,

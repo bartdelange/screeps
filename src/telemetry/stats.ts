@@ -1,10 +1,10 @@
 import { ROLE_CONFIG, RoleName, ROLE_PRIORITY } from "../config";
-import { getTargetForRole } from "../spawning/targets";
-import { getRoomPlan } from "../spawning/roomPlanner";
+import { getRoomPlanCached } from "../spawning/helpers/planAccess";
+import { getTargetForRole } from "../spawning/policies/targets";
 import {
   getNextUpgradeRole,
   getUpgradeCandidates,
-} from "../spawning/upgradePlanner";
+} from "../spawning/policies/upgradePlanner";
 
 const INDENT = "  ";
 
@@ -27,9 +27,7 @@ function roomRoleCounts(room: Room): Record<string, number> {
 }
 
 function getPlan(room: Room) {
-  const mem = room.memory._plan;
-  if (mem && mem.t === Game.time) return mem;
-  return getRoomPlan(room);
+  return getRoomPlanCached(room);
 }
 
 function rclTelemetry(room: Room): StatsSnapshot["rooms"][number]["rcl"] {

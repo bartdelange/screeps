@@ -3,10 +3,14 @@ import {
   planSpawnForRole,
   countRoleInRoom,
   maxCostForRole,
-} from "./spawnEnergyPolicy";
-import { getTargetForRole } from "./targets";
-import { pickBestUpgradeCandidate } from "./upgradePlanner";
-import { getRequestKeyForCreep, getRequestMemoryForKey } from "./requestKey";
+} from "./policies/spawnEnergyPolicy";
+import { getTargetForRole } from "./policies/targets";
+import { pickBestUpgradeCandidate } from "./policies/upgradePlanner";
+import {
+  getRequestKeyForCreep,
+  getRequestMemoryForKey,
+} from "./helpers/requestKey";
+import { isPlanningActive } from "./helpers/planningState";
 
 export type PlannedSpawnIntent =
   | {
@@ -39,11 +43,6 @@ export type RoomPlan = {
     blockedByEnergy: boolean;
   };
 };
-
-function isPlanningActive(creep: Creep): boolean {
-  if (!creep.memory.retire) return true;
-  return creep.memory.retireReason === "near-death";
-}
 
 function hasRequestedCreep(room: Room, role: RoleName, key: string): boolean {
   for (const c of Object.values(Game.creeps)) {

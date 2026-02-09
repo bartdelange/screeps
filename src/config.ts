@@ -1,4 +1,4 @@
-import { basePriority } from "./behaviors/findBestConstructionSite";
+import { basePriority } from "./behaviors/policies/constructionSitePolicy";
 import { containersReady } from "./utils/containersReady";
 import { repairsNeeded } from "./utils/repairsNeeded";
 

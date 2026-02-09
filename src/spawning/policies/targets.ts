@@ -1,4 +1,4 @@
-import { ROLE_CONFIG, RoleName } from "../config";
+import { ROLE_CONFIG, RoleName } from "../../config";
 
 export function getTargetForRole(room: Room, role: RoleName): number {
   const spec = ROLE_CONFIG[role];

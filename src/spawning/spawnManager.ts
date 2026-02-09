@@ -1,6 +1,7 @@
 import { ROLE_CONFIG, RoleName } from "../config";
-import { planSpawnForRole } from "./spawnEnergyPolicy";
-import { getRoomPlan, PlannedSpawnIntent } from "./roomPlanner";
+import { getRoomPlanCached } from "./helpers/planAccess";
+import { planSpawnForRole } from "./policies/spawnEnergyPolicy";
+import type { PlannedSpawnIntent } from "./roomPlanner";
 
 function spawnWithMemory(
   spawn: StructureSpawn,
@@ -39,9 +40,7 @@ function spawnWithMemory(
 }
 
 function getPlannedSpawn(room: Room): PlannedSpawnIntent | undefined {
-  const mem = room.memory._plan;
-  if (mem && mem.t === Game.time) return mem.spawn;
-  return getRoomPlan(room).spawn;
+  return getRoomPlanCached(room).spawn;
 }
 
 export function runSpawnManager(): void {

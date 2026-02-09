@@ -1,4 +1,4 @@
-import { getRoomPlan } from "./roomPlanner";
+import { getRoomPlanCached } from "./helpers/planAccess";
 
 export type SpawnIntent =
   | {
@@ -21,7 +21,7 @@ export type SpawnIntent =
 import { RoleName } from "../config";
 
 export function getNextSpawnIntent(room: Room): SpawnIntent {
-  const plan = getRoomPlan(room);
+  const plan = getRoomPlanCached(room);
   const s = plan.spawn;
   if (!s) return null;
 

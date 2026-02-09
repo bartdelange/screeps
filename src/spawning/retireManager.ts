@@ -1,6 +1,7 @@
 import { ROLE_CONFIG, ROLE_PRIORITY, RoleName } from "../config";
-import { getTargetForRole, getRequestedKeysForRole } from "./targets";
-import { getRoomPlan } from "./roomPlanner";
+import { getRequestKeyForCreep } from "./helpers/requestKey";
+import { getRoomPlanCached } from "./helpers/planAccess";
+import { getTargetForRole, getRequestedKeysForRole } from "./policies/targets";
 import { markRetire } from "../utils/markRetire";
 
 const NEAR_DEATH_TTL = 50;
@@ -28,12 +29,6 @@ function retireSoonestToDie(creeps: Creep[], count: number): void {
   for (let i = 0; i < count && i < sorted.length; i++) {
     markRetire(sorted[i], "excess");
   }
-}
-
-function getRequestKeyForCreep(role: RoleName, creep: Creep): string | null {
-  if (role === "miner")
-    return (creep.memory.sourceId as string | undefined) ?? null;
-  return null;
 }
 
 function hasRedundantReplacement(
@@ -149,10 +144,7 @@ function runRequestBasedRetires(room: Room, role: RoleName): void {
 }
 
 function applyPlannedUpgradeRetire(room: Room): void {
-  const plan =
-    room.memory._plan && room.memory._plan.t === Game.time
-      ? room.memory._plan
-      : getRoomPlan(room);
+  const plan = getRoomPlanCached(room);
 
   const upg = plan.upgrade;
   if (!upg) return;

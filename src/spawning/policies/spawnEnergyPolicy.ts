@@ -1,10 +1,6 @@
-import { ROLE_CONFIG, RoleName } from "../config";
+import { ROLE_CONFIG, RoleName } from "../../config";
 import { getTargetForRole } from "./targets";
-
-function isPlanningActive(creep: Creep): boolean {
-  if (!creep.memory.retire) return true;
-  return creep.memory.retireReason === "near-death";
-}
+import { isPlanningActive } from "../helpers/planningState";
 
 export function countRoleInRoom(room: Room, role: RoleName): number {
   let n = 0;

@@ -1,4 +1,4 @@
-import { RoleName } from "../config";
+import { RoleName } from "../../config";
 
 export function getRequestKeyForCreep(
   role: RoleName,

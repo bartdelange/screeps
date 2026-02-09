@@ -1,4 +1,4 @@
-import { getRoomLinks } from "./getRoomLinks";
+import { getRoomLinks } from "./helpers/getRoomLinks";
 
 export function runLinks(): void {
   for (const room of Object.values(Game.rooms)) {
