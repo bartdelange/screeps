@@ -9,7 +9,7 @@ export function runLinks(): void {
       (l) => l.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
     );
 
-    if (sinks.length === 0) return;
+    if (sinks.length === 0) continue;
 
     const sources = [...source, ...hub].filter(
       (l) => l.store.getUsedCapacity(RESOURCE_ENERGY) >= 200,

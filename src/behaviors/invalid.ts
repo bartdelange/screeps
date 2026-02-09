@@ -1,5 +1,5 @@
-import { isSupportedRole } from "src/utils/isSupportedRole";
-import { markRetire } from "src/utils/markRetire";
+import { isSupportedRole } from "../utils/isSupportedRole";
+import { markRetire } from "../utils/markRetire";
 import { runRetire } from "./retire";
 
 export function runInvalidCreep(creep: Creep): boolean {

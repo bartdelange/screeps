@@ -1,6 +1,7 @@
 import { basePriority } from "./behaviors/policies/constructionSitePolicy";
-import { containersReady } from "./utils/containersReady";
+import { containersReady, getSourcesWithContainer } from "./utils/containersReady";
 import { repairsNeeded } from "./utils/repairsNeeded";
+import { getRoomCreeps } from "./utils/roomCreeps";
 
 export const ROLE_PRIORITY = [
   "harvester",
@@ -42,22 +43,13 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
     memory: (role) => ({ role, working: false, retire: false }),
     spawn: {
       desired: (room) => {
-        const miners = Object.values(Game.creeps).filter(
-          (c) =>
-            c.room.name === room.name &&
-            c.memory.role === "miner" &&
-            !c.memory.retire,
-        ).length;
+        const miners = getRoomCreeps(room, {
+          role: "miner",
+          includeRetiring: false,
+        }).length;
+        const roomContainersReady = containersReady(room);
 
-        const sources = room.find(FIND_SOURCES);
-        const containersReady = sources.every(
-          (s) =>
-            s.pos.findInRange(FIND_STRUCTURES, 1, {
-              filter: (st) => st.structureType === STRUCTURE_CONTAINER,
-            }).length > 0,
-        );
-
-        if (!containersReady || miners === 0) return 2;
+        if (!roomContainersReady || miners === 0) return 2;
 
         return 0;
       },
@@ -174,13 +166,7 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
       desired: (_room) => 0,
 
       requests: (room) => {
-        const sources = room.find(FIND_SOURCES);
-        const eligible = sources.filter((s) => {
-          const c = s.pos.findInRange(FIND_STRUCTURES, 1, {
-            filter: (st) => st.structureType === STRUCTURE_CONTAINER,
-          })[0];
-          return !!c;
-        });
+        const eligible = getSourcesWithContainer(room);
 
         return eligible.map((s, i) => ({
           key: s.id,
@@ -227,23 +213,15 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
     memory: (role) => ({ role, working: false, retire: false }),
     spawn: {
       desired: (room) => {
-        const sourcesWithContainer = room.find(FIND_SOURCES).filter((s) => {
-          const hasContainer =
-            s.pos.findInRange(FIND_STRUCTURES, 1, {
-              filter: (st) => st.structureType === STRUCTURE_CONTAINER,
-            }).length > 0;
-          return hasContainer;
-        });
+        const sourcesWithContainer = getSourcesWithContainer(room);
 
         if (sourcesWithContainer.length === 0) return 0;
 
-        const activeMiners = Object.values(Game.creeps).filter(
-          (c) =>
-            c.room.name === room.name &&
-            c.memory.role === "miner" &&
-            !c.memory.retire &&
-            typeof c.memory.sourceId === "string",
-        );
+        const activeMiners = getRoomCreeps(room, {
+          role: "miner",
+          includeRetiring: false,
+          predicate: (c) => typeof c.memory.sourceId === "string",
+        });
 
         const activeMinerSourceIds = new Set(
           activeMiners.map((m) => m.memory.sourceId),

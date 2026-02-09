@@ -1,4 +1,5 @@
 import type { ActResult, EnergyWithdrawTarget } from "./types";
+import { moveWithRecovery } from "./moveWithRecovery";
 import {
   countWithdrawClaimants,
   isDroppedEnergy,
@@ -23,8 +24,11 @@ export function withdrawEnergy(
     const res = creep.pickup(target);
     if (res === OK) return "done";
     if (res === ERR_NOT_IN_RANGE) {
-      creep.moveTo(target, { reusePath: 20 });
-      return "not_in_range";
+      const moveRes = moveWithRecovery(creep, target.pos, {
+        reusePath: 20,
+        maxRooms: 1,
+      });
+      return moveRes === "invalid" ? "blocked" : "not_in_range";
     }
     return "blocked";
   }
@@ -45,8 +49,11 @@ export function withdrawEnergy(
 
   if (res === OK) return "done";
   if (res === ERR_NOT_IN_RANGE) {
-    creep.moveTo(target, { reusePath: 20 });
-    return "not_in_range";
+    const moveRes = moveWithRecovery(creep, target.pos, {
+      reusePath: 20,
+      maxRooms: 1,
+    });
+    return moveRes === "invalid" ? "blocked" : "not_in_range";
   }
   return "blocked";
 }

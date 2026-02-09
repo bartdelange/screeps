@@ -1,16 +1,13 @@
 import { ROLE_CONFIG, RoleName } from "../../config";
 import { getTargetForRole } from "./targets";
 import { isPlanningActive } from "../helpers/planningState";
+import { getRoomCreeps } from "../../utils/roomCreeps";
 
 export function countRoleInRoom(room: Room, role: RoleName): number {
-  let n = 0;
-  for (const c of Object.values(Game.creeps)) {
-    if (c.room.name !== room.name) continue;
-    if (c.memory.role !== role) continue;
-    if (!isPlanningActive(c)) continue;
-    n++;
-  }
-  return n;
+  return getRoomCreeps(room, {
+    role,
+    predicate: isPlanningActive,
+  }).length;
 }
 
 export function bodyCost(body: BodyPartConstant[]): number {
