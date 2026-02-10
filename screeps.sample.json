@@ -1,0 +1,14 @@
+{
+  "main": {
+    "token": "YOUR_MMORTAL_TOKEN",
+    "branch": "default"
+  },
+  "pserver": {
+    "host": "127.0.0.1",
+    "port": 21025,
+    "secure": false,
+    "username": "user",
+    "password": "pass",
+    "branch": "default"
+  }
+}

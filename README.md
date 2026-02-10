@@ -16,28 +16,19 @@ TypeScript Screeps AI with role-based creep behavior, spawn planning, link/tower
 yarn install
 ```
 
-2. Create local environment file:
-
-```bash
-cp .env.example .env
-```
-
-3. Configure deployment target in `.env`:
+2. Create local config files:
 
 ```env
-SCREEPS_SERVER=your_server_name
-SCREEPS_BRANCH=default
-# Optional path override:
-# SCREEPS_DIR=/absolute/path/to/Screeps/scripts/server/branch
+cp screeps.sample.json screeps.json
 ```
 
-4. Build once:
+3. Build once:
 
 ```bash
 yarn build
 ```
 
-5. Watch and auto-copy:
+4. Watch local build:
 
 ```bash
 yarn watch
@@ -45,8 +36,14 @@ yarn watch
 
 ## Scripts
 
-- `yarn build`: build `dist/main.js` and copy to Screeps scripts directory
-- `yarn watch`: watch mode build + copy on changes
+- `yarn build`: build locally (`DEST=local`, no upload)
+- `yarn build:main`: upload using `screeps.json.main`
+- `yarn build:pserver`: upload using `screeps.json.pserver`
+- `yarn watch`: local watch build
+- `yarn watch:main`: watch + upload using `screeps.json.main`
+- `yarn watch:pserver`: watch + upload using `screeps.json.pserver`
+
+For private servers with custom certificates, pserver scripts run with `NODE_OPTIONS=--use-system-ca`.
 
 ## Architecture
 
@@ -59,11 +56,11 @@ yarn watch
 
 ## Environment Variables
 
-Loaded via `dotenv` in `rollup.config.mjs`.
+Loaded via `dotenv` in `rollup.config.js`.
 
-- `SCREEPS_SERVER`: Screeps local/private server directory name
-- `SCREEPS_BRANCH`: Screeps branch name
-- `SCREEPS_DIR`: explicit full destination path for deployed `main.js`
+- `DEST`: target profile (`local`, `main`, `pserver`)
+
+Upload credentials and targets live in `screeps.json` (copied from `screeps.sample.json`).
 
 ## Contributing
 
@@ -76,4 +73,3 @@ See `SECURITY.md`.
 ## License
 
 MIT, see `LICENSE`.
-

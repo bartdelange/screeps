@@ -78,6 +78,8 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.screeps.json
+screeps.json
 .env.development.local
 .env.test.local
 .env.production.local
