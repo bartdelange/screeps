@@ -1,5 +1,6 @@
 import type { RoleName } from "../config";
 import type { RoomPlan } from "../spawning/roomPlanner";
+import type { StatsLatestV1 } from "../telemetry/statsLatest";
 
 type IntelRoomMemory = {
   lastSeen: number;
@@ -54,6 +55,7 @@ declare global {
   interface Memory {
     enableScouting?: boolean;
     intel?: IntelMemory;
+    stats?: StatsLatestV1;
   }
 }
 

@@ -1,5 +1,5 @@
 import { cleanupCreepMemory } from './utils/memory';
-import { reportStatsEvery } from './telemetry/stats';
+import { refreshStatsLatestEvery } from './telemetry/statsLatest';
 
 import { runPlanManager } from './spawning/planManager';
 import { runSpawnManager } from './spawning/spawnManager';
@@ -31,7 +31,7 @@ export const loop = (): void => {
     runRoom(room);
   }
 
-  reportStatsEvery(25);
+  refreshStatsLatestEvery(25);
 
   if ((globalThis as any).__bootStart) {
     const ms = Date.now() - (globalThis as any).__bootStart;

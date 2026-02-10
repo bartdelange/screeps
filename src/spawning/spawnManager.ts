@@ -2,6 +2,7 @@ import { ROLE_CONFIG, RoleName } from "../config";
 import { getRoomPlanCached } from "./helpers/planAccess";
 import { planSpawnForRole } from "./policies/spawnEnergyPolicy";
 import type { PlannedSpawnIntent } from "./roomPlanner";
+import { updateStatsLatestAfterSpawn } from "../telemetry/statsLatest";
 
 function spawnWithMemory(
   spawn: StructureSpawn,
@@ -60,15 +61,17 @@ export function runSpawnManager(room: Room): void {
     if (intent.blockedByEnergy) continue;
 
     if (intent.kind === "request") {
-      spawnWithMemory(
+      const spawned = spawnWithMemory(
         spawn,
         intent.role,
         intent.memory,
         intent.nameHint ?? intent.key.slice(-4),
       );
+      if (spawned) updateStatsLatestAfterSpawn(spawn, intent);
       continue;
     }
 
-    spawnWithMemory(spawn, intent.role);
+    const spawned = spawnWithMemory(spawn, intent.role);
+    if (spawned) updateStatsLatestAfterSpawn(spawn, intent);
   }
 }
