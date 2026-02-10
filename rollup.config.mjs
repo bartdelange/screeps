@@ -9,7 +9,7 @@ const SCREEPS_DIR =
   process.env.SCREEPS_DIR ??
   `${process.env.HOME}/Library/Application Support/Screeps/scripts/${SCREEPS_SERVER}/${SCREEPS_BRANCH}`;
 
-if ((!SCREEPS_SERVER || !SCREEPS_BRANCH) && !process.env.SCREEPS_DIR) {
+if ((!SCREEPS_SERVER && !SCREEPS_BRANCH) && !process.env.SCREEPS_DIR) {
   console.error(
     "Error: SCREEPS_SERVER and SCREEPS_BRANCH environment variables must be set.",
   );

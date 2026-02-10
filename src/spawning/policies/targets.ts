@@ -20,7 +20,11 @@ export function getRequestKeyForCreep(
   if (role === "miner")
     return (creep.memory.sourceId as string | undefined) ?? null;
   if (role === "mover")
-    return (creep.memory.moverRequestKey as string | undefined) ?? null;
+    return (
+      (creep.memory.moverSourceId as string | undefined) ??
+      (creep.memory.moverRequestKey as string | undefined) ??
+      null
+    );
   return null;
 }
 
@@ -30,7 +34,10 @@ export function getRequestMemoryForKey(
 ): Partial<CreepMemory> | null {
   if (role === "miner") return { sourceId: key as Id<Source> };
   if (role === "mover") {
-    return { moverRequestKey: key };
+    return {
+      moverSourceId: key as Id<Source>,
+      moverRequestKey: key,
+    };
   }
   return null;
 }

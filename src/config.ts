@@ -226,41 +226,15 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
 
         const maxMovers = (room.controller?.level ?? 1) >= 3 ? 2 : 1;
         const desiredMovers = Math.min(maxMovers, sourcesWithContainer.length);
-        if (desiredMovers === 0) return [];
 
-        const availableSourceIds = new Set(sourcesWithContainer.map((s) => s.id));
-        const activeMinerSourceIds = [
-          ...new Set(
-            getRoomCreeps(room, {
-              role: "miner",
-              includeRetiring: false,
-              predicate: (c) => typeof c.memory.sourceId === "string",
-            }).map((c) => c.memory.sourceId as Id<Source>),
-          ),
-        ].filter((id) => availableSourceIds.has(id));
-
-        const assignmentPool =
-          activeMinerSourceIds.length > 0
-            ? activeMinerSourceIds
-            : sourcesWithContainer.map((s) => s.id);
-        const sourceIndexById = new Map(
-          sourcesWithContainer.map((s, i) => [s.id, i] as const),
-        );
-
-        return Array.from({ length: desiredMovers }, (_, i) => {
-          const sourceId = assignmentPool[i % assignmentPool.length];
-          const key = `slot:${i}`;
-          const sourceIndex = sourceIndexById.get(sourceId) ?? i;
-
-          return {
-            key,
-            nameHint: `src${sourceIndex}`,
-            memory: {
-              moverSourceId: sourceId,
-              moverRequestKey: key,
-            },
-          };
-        });
+        return sourcesWithContainer.slice(0, desiredMovers).map((s, i) => ({
+          key: s.id,
+          nameHint: `src${i}`,
+          memory: {
+            moverSourceId: s.id,
+            moverRequestKey: s.id,
+          },
+        }));
       },
     },
   },

@@ -173,12 +173,20 @@ export function getRoomPlan(room: Room): RoomPlan {
         if (hasRequests) {
           const key = getRequestKeyForCreep(best.role, best.creep);
           const memory = key ? getRequestMemoryForKey(best.role, key) : null;
+          const extraMemory =
+            best.role === "mover" &&
+            typeof best.creep.memory.moverSourceId === "string"
+              ? { moverSourceId: best.creep.memory.moverSourceId }
+              : null;
 
           plan.spawn = {
             kind: "count",
             role: best.role,
             nameHint: key ? key.slice(-4) : undefined,
-            memory: memory ?? undefined,
+            memory: {
+              ...(memory ?? {}),
+              ...(extraMemory ?? {}),
+            },
             blockedByEnergy: false,
             requiredEnergy,
             reason: "upgrade",
