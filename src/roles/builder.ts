@@ -2,8 +2,8 @@ import { actAtRange } from "../behaviors/actAtRange";
 import { findBestConstructionSite } from "../behaviors/findBestConstructionSite";
 import { getEnergyForRole } from "../behaviors/getEnergyForRole";
 import { runUpgradeWork } from "../behaviors/runUpgradeWork";
-import { updateWorkingState } from "../behaviors/updateWorkingState";
 import { sayState } from "../utils/sayState";
+import { runRoleStateMachine } from "../fsm/runRoleStateMachine";
 
 const ICONS: Record<string, string> = {
   withdraw: "📦",
@@ -19,6 +19,25 @@ type BuilderTask =
   | { kind: "build"; target: ConstructionSite }
   | { kind: "upgrade"; target: StructureController }
   | { kind: "idle" };
+
+type BuilderState = "gather" | "repair" | "build" | "upgrade" | "idle";
+
+function isBuilderState(value: unknown): value is BuilderState {
+  return (
+    value === "gather" ||
+    value === "repair" ||
+    value === "build" ||
+    value === "upgrade" ||
+    value === "idle"
+  );
+}
+
+function mapTaskToBuilderState(task: BuilderTask): Exclude<BuilderState, "gather"> {
+  if (task.kind === "repair") return "repair";
+  if (task.kind === "build") return "build";
+  if (task.kind === "upgrade") return "upgrade";
+  return "idle";
+}
 
 function selectBuilderTask(creep: Creep): BuilderTask {
   const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
@@ -77,13 +96,52 @@ function runBuilderWork(
   return "idle";
 }
 
-export function runBuilder(creep: Creep): void {
-  const phase = updateWorkingState(creep);
+function switchBuilderState(creep: Creep, current: BuilderState): BuilderState {
+  const used = creep.store.getUsedCapacity(RESOURCE_ENERGY);
+  const free = creep.store.getFreeCapacity();
+
+  if (current !== "gather" && used === 0) {
+    creep.memory.working = false;
+    return "gather";
+  }
+
+  if (current === "gather") {
+    if (free === 0) {
+      creep.memory.working = true;
+      return mapTaskToBuilderState(selectBuilderTask(creep));
+    }
+    creep.memory.working = false;
+    return "gather";
+  }
+
+  creep.memory.working = true;
+  return mapTaskToBuilderState(selectBuilderTask(creep));
+}
+
+function runBuilderState(
+  creep: Creep,
+  state: BuilderState,
+): "repair" | "build" | "upgrade" | "withdraw" | "harvest" | "idle" {
+  if (state === "gather") {
+    const task = selectBuilderTask(creep);
+    return getEnergyForRole(creep, { preferPos: getBuilderPreferPos(task, creep) });
+  }
+
   const task = selectBuilderTask(creep);
-  const state =
-    phase === "gather"
-      ? getEnergyForRole(creep, { preferPos: getBuilderPreferPos(task, creep) })
-      : runBuilderWork(creep, task);
+  return runBuilderWork(creep, task);
+}
+
+export function runBuilder(creep: Creep): void {
+  const state = runRoleStateMachine<BuilderState, ReturnType<typeof runBuilderState>>(
+    creep,
+    {
+      memoryKey: "_state",
+      isState: isBuilderState,
+      getInitialState: (c) => (c.store.getFreeCapacity() === 0 ? "idle" : "gather"),
+      switchState: switchBuilderState,
+      runState: runBuilderState,
+    },
+  );
 
   sayState(creep, ICONS[state] ?? ICONS.idle);
 }
