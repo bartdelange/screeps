@@ -5,6 +5,8 @@ import {
 } from "./utils/containersReady";
 import { repairsNeeded } from "./utils/repairsNeeded";
 import { getRoomCreeps } from "./utils/roomCreeps";
+import { canSpawnScout } from "./scouting/scoutingPolicy";
+import { getScoutTargetsForRoom } from "./scouting/targeting";
 
 export const ROLE_PRIORITY = [
   "harvester",
@@ -12,6 +14,7 @@ export const ROLE_PRIORITY = [
   "mover",
   "builder",
   "upgrader",
+  "scout",
 ] as const;
 export type RoleName = (typeof ROLE_PRIORITY)[number];
 
@@ -235,6 +238,37 @@ export const ROLE_CONFIG: Record<RoleName, RoleSpec> = {
             moverRequestKey: s.id,
           },
         }));
+      },
+    },
+  },
+
+  scout: {
+    minEnergy: 50,
+    makeBody: () => {
+      return [MOVE];
+    },
+    memory: (role) => ({ role, retire: false }),
+    spawn: {
+      desired: (_room) => 0,
+      requests: (room) => {
+        if (!canSpawnScout(room)) return [];
+
+        const queue = getScoutTargetsForRoom(room.name);
+        if (queue.length === 0) return [];
+
+        const key = `scout:${room.name}`;
+        return [
+          {
+            key,
+            nameHint: room.name,
+            memory: {
+              homeRoom: room.name,
+              scoutQueue: queue,
+              scoutTarget: queue[0],
+              scoutRequestKey: key,
+            },
+          },
+        ];
       },
     },
   },

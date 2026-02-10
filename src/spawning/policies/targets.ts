@@ -25,6 +25,8 @@ export function getRequestKeyForCreep(
       (creep.memory.moverRequestKey as string | undefined) ??
       null
     );
+  if (role === "scout")
+    return (creep.memory.scoutRequestKey as string | undefined) ?? null;
   return null;
 }
 

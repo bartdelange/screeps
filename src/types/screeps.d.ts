@@ -4,6 +4,31 @@ import type { RoomPlan } from "../spawning/roomPlanner";
 type StatsSnapshot = {
   t: number;
   cpu: { used: number; limit: number; bucket: number };
+  scouting: {
+    enabled: boolean;
+    totalScouts: number;
+    readyOwnedRooms: number;
+    totalOwnedRooms: number;
+    totalTargets: number;
+    totalQueuedTargets: number;
+    blockers: Record<string, number>;
+  };
+  intel: {
+    knownRooms: number;
+    knownDangerRooms: number;
+    staleRooms: number;
+    rooms: Array<{
+      name: string;
+      age: number;
+      owner?: string;
+      reserver?: string;
+      hostileCreeps: number;
+      hostileStructures: number;
+      dangerFor: number;
+      sources?: number;
+      mineral?: MineralConstant;
+    }>;
+  };
   rooms: Array<{
     name: string;
     energy: { available: number; capacity: number };
@@ -41,6 +66,24 @@ type StatsSnapshot = {
   }>;
 };
 
+type IntelRoomMemory = {
+  lastSeen: number;
+  owner?: string;
+  reserver?: string;
+  hostileCreeps: number;
+  hostileStructures: number;
+  dangerUntil: number;
+  staticSeen?: number;
+  sources?: number;
+  mineral?: MineralConstant;
+  controllerId?: string;
+};
+
+type IntelMemory = {
+  rooms: Record<string, IntelRoomMemory>;
+  scoutQueues: Record<string, string[]>;
+};
+
 declare global {
   interface CreepMemory {
     role?: RoleName;
@@ -62,6 +105,11 @@ declare global {
     _lp?: string;
     _stuck?: number;
     _lastState?: string;
+
+    homeRoom?: string;
+    scoutQueue?: string[];
+    scoutTarget?: string;
+    scoutRequestKey?: string;
   }
 
   interface RoomMemory {
@@ -70,6 +118,8 @@ declare global {
 
   interface Memory {
     stats?: StatsSnapshot;
+    enableScouting?: boolean;
+    intel?: IntelMemory;
   }
 }
 

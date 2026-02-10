@@ -46,9 +46,15 @@ export type RoomPlan = {
 
 function hasRequestedCreep(room: Room, role: RoleName, key: string): boolean {
   for (const c of Object.values(Game.creeps)) {
-    if (c.room.name !== room.name) continue;
     if (c.memory.role !== role) continue;
     if (!isPlanningActive(c)) continue;
+
+    if (role === "scout") {
+      const homeRoom = c.memory.homeRoom as string | undefined;
+      if (homeRoom !== room.name) continue;
+    } else if (c.room.name !== room.name) {
+      continue;
+    }
 
     const creepKey = getRequestKeyForCreep(role, c);
     if (creepKey === key) return true;

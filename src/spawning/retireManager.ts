@@ -8,6 +8,11 @@ import {
 import { markRetire } from "../utils/markRetire";
 
 const NEAR_DEATH_TTL = 50;
+const RETIRE_EXCLUDED_ROLES = new Set<RoleName>(["scout"]);
+
+function isRoleExcludedFromRetire(role: RoleName): boolean {
+  return RETIRE_EXCLUDED_ROLES.has(role);
+}
 
 function isUsableForRetireLogic(c: Creep): boolean {
   if (c.spawning) return false;
@@ -159,6 +164,9 @@ function applyPlannedUpgradeRetire(room: Room): void {
   if (creep.memory.retire) return;
   if (creep.spawning) return;
 
+  const role = creep.memory.role as RoleName | undefined;
+  if (role && isRoleExcludedFromRetire(role)) return;
+
   markRetire(creep, "planned-upgrade");
 }
 
@@ -166,6 +174,8 @@ export function runRetireManager(room: Room): void {
   if (!room.controller?.my) return;
 
   for (const role of ROLE_PRIORITY) {
+    if (isRoleExcludedFromRetire(role)) continue;
+
     const spec = ROLE_CONFIG[role];
 
     const hasRequests = (spec.spawn.requests?.(room) ?? []).length > 0;

@@ -7,8 +7,10 @@ import { runRetireManager } from "./spawning/retireManager";
 import { runLinks } from "./links/linkManager";
 import { runTowers } from "./towers/towerManager";
 import { runCreepManager } from "./creeps/creepManager";
+import { runIntelManager } from "./intel/intelManager";
 
 function runRoom(room: Room): void {
+  runIntelManager(room);
   runPlanManager(room);
   runRetireManager(room);
   runSpawnManager(room);
