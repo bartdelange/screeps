@@ -11,7 +11,7 @@ type RoleEnergyAcquirePolicy = {
 
 const DEFAULT_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
   excludeLinkRoles: ["source", "hub", "storage", "controller"],
-  includeDropped: false,
+  includeDropped: true,
 };
 
 const MOVER_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
@@ -23,7 +23,7 @@ const MOVER_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
 
 const UPGRADER_WITHDRAW_POLICY: EnergyWithdrawPolicy = {
   excludeLinkRoles: ["source", "hub", "storage"],
-  includeDropped: false,
+  includeDropped: true,
   preferLinkRoles: ["controller"],
 };
 

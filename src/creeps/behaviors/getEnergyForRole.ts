@@ -37,6 +37,12 @@ export function getEnergyForRole(
         },
       },
       findTarget: (c) => {
+        const dropped = findEnergyWithdrawTarget(c, {
+          includeDropped: true,
+          includeStructures: [],
+        });
+        if (dropped) return dropped;
+
         const sourcesWithContainer = getSourcesWithContainer(c.room);
         const sourceIdsInOrder = sourcesWithContainer.map((s) => s.id);
         const activeMinerSourceIds = new Set(

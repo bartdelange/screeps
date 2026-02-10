@@ -1,13 +1,13 @@
-import { cleanupCreepMemory } from "./utils/memory";
-import { reportStatsEvery, updateTelemetry } from "./telemetry/stats";
+import { cleanupCreepMemory } from './utils/memory';
+import { reportStatsEvery } from './telemetry/stats';
 
-import { runPlanManager } from "./spawning/planManager";
-import { runSpawnManager } from "./spawning/spawnManager";
-import { runRetireManager } from "./spawning/retireManager";
-import { runLinks } from "./links/linkManager";
-import { runTowers } from "./towers/towerManager";
-import { runCreepManager } from "./creeps/creepManager";
-import { runIntelManager } from "./intel/intelManager";
+import { runPlanManager } from './spawning/planManager';
+import { runSpawnManager } from './spawning/spawnManager';
+import { runRetireManager } from './spawning/retireManager';
+import { runLinks } from './links/linkManager';
+import { runTowers } from './towers/towerManager';
+import { runCreepManager } from './creeps/creepManager';
+import { runIntelManager } from './intel/intelManager';
 
 function runRoom(room: Room): void {
   runIntelManager(room);
@@ -19,6 +19,10 @@ function runRoom(room: Room): void {
   runCreepManager(room);
 }
 
+const BOOT_START = Date.now();
+console.log(`[boot] start t=${Game.time}`);
+(globalThis as any).__bootStart = BOOT_START;
+
 export const loop = (): void => {
   cleanupCreepMemory();
 
@@ -27,6 +31,11 @@ export const loop = (): void => {
     runRoom(room);
   }
 
-  updateTelemetry();
   reportStatsEvery(25);
+
+  if ((globalThis as any).__bootStart) {
+    const ms = Date.now() - (globalThis as any).__bootStart;
+    console.log(`[boot] finished in ${ms}ms at t=${Game.time}`);
+    delete (globalThis as any).__bootStart;
+  }
 };
