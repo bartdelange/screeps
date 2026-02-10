@@ -58,6 +58,7 @@ declare global {
 
     _wId?: Id<_HasId>;
     _dId?: Id<AnyStoreStructure>;
+    _state?: string;
     _lp?: string;
     _stuck?: number;
     _lastState?: string;
