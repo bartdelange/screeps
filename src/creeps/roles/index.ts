@@ -1,4 +1,4 @@
-import { RoleName } from "../config";
+import { RoleName } from "../../config";
 import { runHarvester } from "./harvester";
 import { runUpgrader } from "./upgrader";
 import { runBuilder } from "./builder";

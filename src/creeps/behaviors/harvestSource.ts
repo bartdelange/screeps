@@ -1,5 +1,5 @@
 import type { ActResult } from "./helpers/core";
-import { getReservedSourceIds } from "../utils/reservedSources";
+import { getReservedSourceIds } from "../../utils/reservedSources";
 
 export function harvestSource(creep: Creep, source: Source): ActResult {
   if (creep.memory.role !== "miner") {

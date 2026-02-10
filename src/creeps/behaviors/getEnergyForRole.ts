@@ -7,8 +7,8 @@ import { findEnergyWithdrawTarget } from "./policies/energyAcquirePolicy";
 import { findEnergyDepositTarget } from "./policies/energyDepositPolicy";
 import { getEnergyAcquirePolicyForRole } from "./policies/roleEnergyPolicy";
 import { findSourceStorageUnit } from "./findSourceStorageUnit";
-import { getSourcesWithContainer } from "../utils/containersReady";
-import { getRoomCreeps } from "../utils/roomCreeps";
+import { getSourcesWithContainer } from "../../utils/containersReady";
+import { getRoomCreeps } from "../../utils/roomCreeps";
 
 type GetEnergyForRoleOpts = {
   preferPos?: RoomPosition;

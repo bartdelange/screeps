@@ -1,7 +1,7 @@
 import { getEnergyForRole } from "../behaviors/getEnergyForRole";
 import { runUpgradeWork } from "../behaviors/runUpgradeWork";
-import { sayState } from "../utils/sayState";
-import { runRoleStateMachine } from "../fsm/runRoleStateMachine";
+import { sayState } from "../../utils/sayState";
+import { runRoleStateMachine } from "../../fsm/runRoleStateMachine";
 
 const ICONS: Record<string, string> = {
   withdraw: "📦",

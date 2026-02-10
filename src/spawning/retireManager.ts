@@ -162,32 +162,29 @@ function applyPlannedUpgradeRetire(room: Room): void {
   markRetire(creep, "planned-upgrade");
 }
 
-export function runRetireManager(): void {
-  const rooms = Object.values(Game.rooms).filter((r) => r.controller?.my);
-  if (rooms.length === 0) return;
+export function runRetireManager(room: Room): void {
+  if (!room.controller?.my) return;
 
-  for (const room of rooms) {
-    for (const role of ROLE_PRIORITY) {
-      const spec = ROLE_CONFIG[role];
+  for (const role of ROLE_PRIORITY) {
+    const spec = ROLE_CONFIG[role];
 
-      const hasRequests = (spec.spawn.requests?.(room) ?? []).length > 0;
-      if (hasRequests) {
-        runRequestBasedRetires(room, role);
-        continue;
-      }
-
-      const target = getTargetForRole(room, role);
-      const creeps = creepsInRoomByRole(room, role);
-      const active = creeps.length;
-
-      if (active > target) {
-        retireSoonestToDie(creeps, active - target);
-        continue;
-      }
-
-      applyNearDeathRetires(room, role, target);
+    const hasRequests = (spec.spawn.requests?.(room) ?? []).length > 0;
+    if (hasRequests) {
+      runRequestBasedRetires(room, role);
+      continue;
     }
 
-    applyPlannedUpgradeRetire(room);
+    const target = getTargetForRole(room, role);
+    const creeps = creepsInRoomByRole(room, role);
+    const active = creeps.length;
+
+    if (active > target) {
+      retireSoonestToDie(creeps, active - target);
+      continue;
+    }
+
+    applyNearDeathRetires(room, role, target);
   }
+
+  applyPlannedUpgradeRetire(room);
 }

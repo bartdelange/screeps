@@ -1,31 +1,29 @@
 import { getRoomLinks } from "./helpers/getRoomLinks";
 
-export function runLinks(): void {
-  for (const room of Object.values(Game.rooms)) {
-    if (!room.controller?.my) continue;
-    const { source, hub, controller, storage } = getRoomLinks(room);
+export function runLinks(room: Room): void {
+  if (!room.controller?.my) return;
+  const { source, hub, controller, storage } = getRoomLinks(room);
 
-    // console.log(
-    //   `Room ${room.name} has ${source.length} source links, ${hub.length} hub links, ${controller.length} controller links, and ${storage.length} storage links.`,
-    // );
+  // console.log(
+  //   `Room ${room.name} has ${source.length} source links, ${hub.length} hub links, ${controller.length} controller links, and ${storage.length} storage links.`,
+  // );
 
-    const sinks = [...controller, ...storage].filter(
-      (l) => l.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
-    );
+  const sinks = [...controller, ...storage].filter(
+    (l) => l.store.getFreeCapacity(RESOURCE_ENERGY) > 0,
+  );
 
-    if (sinks.length === 0) continue;
+  if (sinks.length === 0) return;
 
-    const sources = [...source, ...hub].filter(
-      (l) => l.store.getUsedCapacity(RESOURCE_ENERGY) >= 200,
-    );
+  const sources = [...source, ...hub].filter(
+    (l) => l.store.getUsedCapacity(RESOURCE_ENERGY) >= 200,
+  );
 
-    for (const src of sources) {
-      if (src.cooldown > 0) continue;
+  for (const src of sources) {
+    if (src.cooldown > 0) continue;
 
-      const target = sinks[0];
-      if (!target) break;
+    const target = sinks[0];
+    if (!target) break;
 
-      src.transferEnergy(target);
-    }
+    src.transferEnergy(target);
   }
 }

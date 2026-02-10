@@ -1,4 +1,4 @@
-import { getLinkRole, type LinkRole } from "../../links/policies/getLinkRole";
+import { getLinkRole, type LinkRole } from "../../../links/policies/getLinkRole";
 import type { EnergyWithdrawTarget } from "../helpers/core";
 
 export type EnergyWithdrawPolicy = {

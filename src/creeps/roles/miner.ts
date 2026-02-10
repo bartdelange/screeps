@@ -1,9 +1,9 @@
 import { findSourceStorageUnit } from "../behaviors/findSourceStorageUnit";
 import { moveOnto } from "../behaviors/moveOnto";
 import { harvestSource } from "../behaviors/harvestSource";
-import { sayState } from "../utils/sayState";
-import { markRetire } from "../utils/markRetire";
-import { runRoleStateMachine } from "../fsm/runRoleStateMachine";
+import { sayState } from "../../utils/sayState";
+import { markRetire } from "../../utils/markRetire";
+import { runRoleStateMachine } from "../../fsm/runRoleStateMachine";
 
 const ICONS = {
   mining: "⛏️",

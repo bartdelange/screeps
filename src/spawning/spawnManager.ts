@@ -43,8 +43,12 @@ function getPlannedSpawn(room: Room): PlannedSpawnIntent | undefined {
   return getRoomPlanCached(room).spawn;
 }
 
-export function runSpawnManager(): void {
-  const spawns = Object.values(Game.spawns);
+export function runSpawnManager(room: Room): void {
+  if (!room.controller?.my) return;
+
+  const spawns = Object.values(Game.spawns).filter(
+    (spawn) => spawn.room.name === room.name,
+  );
   if (spawns.length === 0) return;
 
   for (const spawn of spawns) {

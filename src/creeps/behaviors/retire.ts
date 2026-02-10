@@ -1,7 +1,7 @@
 import { findSpawnOrExtensionNeedingEnergy } from "./helpers/findSpawnOrExtensionNeedingEnergy";
 import { findEnergyDepositTarget } from "./helpers/findEnergyDepositTarget";
 import { transferEnergy } from "./transferEnergy";
-import { sayState } from "../utils/sayState";
+import { sayState } from "../../utils/sayState";
 
 export function getGraveyardPos(creep: Creep): RoomPosition | null {
   const flag = Game.flags["Graveyard"];

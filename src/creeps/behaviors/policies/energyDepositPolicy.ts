@@ -1,4 +1,4 @@
-import { getLinkRole, type LinkRole } from "../../links/policies/getLinkRole";
+import { getLinkRole, type LinkRole } from "../../../links/policies/getLinkRole";
 import { getEnergyDepositPolicyForRole } from "./roleEnergyPolicy";
 
 export type EnergyDepositPolicy = {

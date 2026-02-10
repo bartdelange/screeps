@@ -1,8 +1,6 @@
 import { getRoomPlan } from "./roomPlanner";
 
-export function runPlanManager(): void {
-  for (const room of Object.values(Game.rooms)) {
-    if (!room.controller?.my) continue;
-    room.memory._plan = getRoomPlan(room);
-  }
+export function runPlanManager(room: Room): void {
+  if (!room.controller?.my) return;
+  room.memory._plan = getRoomPlan(room);
 }

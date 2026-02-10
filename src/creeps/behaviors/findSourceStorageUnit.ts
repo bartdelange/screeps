@@ -1,4 +1,4 @@
-import { getLinkRole } from "../links/policies/getLinkRole";
+import { getLinkRole } from "../../links/policies/getLinkRole";
 
 export function findSourceStorageUnit(
   source: Source,

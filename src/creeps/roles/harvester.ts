@@ -2,8 +2,8 @@ import { findEnergyDepositTarget } from "../behaviors/policies/energyDepositPoli
 import { harvestSource } from "../behaviors/harvestSource";
 import { runUpgradeWork } from "../behaviors/runUpgradeWork";
 import { transferEnergy } from "../behaviors/transferEnergy";
-import { sayState } from "../utils/sayState";
-import { runRoleStateMachine } from "../fsm/runRoleStateMachine";
+import { sayState } from "../../utils/sayState";
+import { runRoleStateMachine } from "../../fsm/runRoleStateMachine";
 
 const ICONS: Record<string, string> = {
   harvest: "⛏️",

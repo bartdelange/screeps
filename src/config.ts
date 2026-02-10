@@ -1,4 +1,4 @@
-import { basePriority } from "./behaviors/policies/constructionSitePolicy";
+import { basePriority } from "./creeps/behaviors/policies/constructionSitePolicy";
 import {
   containersReady,
   getSourcesWithContainer,

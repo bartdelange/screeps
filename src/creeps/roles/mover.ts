@@ -1,8 +1,8 @@
 import { findEnergyDepositTarget } from "../behaviors/policies/energyDepositPolicy";
 import { getEnergyForRole } from "../behaviors/getEnergyForRole";
 import { runDeliverEnergyWithCache } from "../behaviors/runDeliverEnergyWithCache";
-import { sayState } from "../utils/sayState";
-import { runRoleStateMachine } from "../fsm/runRoleStateMachine";
+import { sayState } from "../../utils/sayState";
+import { runRoleStateMachine } from "../../fsm/runRoleStateMachine";
 
 const ICONS: Record<string, string> = {
   withdraw: "📦",

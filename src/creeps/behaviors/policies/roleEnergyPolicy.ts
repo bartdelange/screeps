@@ -1,5 +1,5 @@
-import { getRoomCreeps } from "../../utils/roomCreeps";
-import type { RoleName } from "../../config";
+import { getRoomCreeps } from "../../../utils/roomCreeps";
+import type { RoleName } from "../../../config";
 import type { EnergyWithdrawPolicy } from "./energyAcquirePolicy";
 import type { EnergyDepositPolicy } from "./energyDepositPolicy";
 
