@@ -1,8 +1,9 @@
-import type { RoleName } from "../config";
-import type { RoomPlan } from "../spawning/roomPlanner";
-import type { StatsLatestV1 } from "../telemetry/statsLatest";
+import type { RoleName } from '../config';
+import type { RoomPlan } from '../spawning/roomPlanner';
+import type { StatsLatestV1 } from '../telemetry/statsLatest';
 
 type IntelRoomMemory = {
+  roomName: string;
   lastSeen: number;
   owner?: string;
   reserver?: string;
@@ -16,6 +17,7 @@ type IntelRoomMemory = {
 };
 
 type IntelMemory = {
+  t: number;
   rooms: Record<string, IntelRoomMemory>;
   scoutQueues: Record<string, string[]>;
 };

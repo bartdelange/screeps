@@ -1,4 +1,5 @@
 export type IntelRoomRecord = {
+  roomName: string;
   lastSeen: number;
   owner?: string;
   reserver?: string;
@@ -12,15 +13,20 @@ export type IntelRoomRecord = {
 };
 
 export type IntelMemory = {
+  t: number;
   rooms: Record<string, IntelRoomRecord>;
   scoutQueues: Record<string, string[]>;
 };
 
 export function getIntelMemory(): IntelMemory {
   const intel = Memory.intel;
-  if (intel) return intel;
+  if (intel) {
+    intel.t = Game.time;
+    return intel;
+  }
 
   Memory.intel = {
+    t: Game.time,
     rooms: {},
     scoutQueues: {},
   };

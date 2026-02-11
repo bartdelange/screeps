@@ -14,6 +14,7 @@ export function runIntelManager(room: Room): void {
     : Math.max(prior?.dangerUntil ?? 0, Game.time);
 
   const next = {
+    roomName: room.name,
     lastSeen: Game.time,
     owner: room.controller?.owner?.username,
     reserver: room.controller?.reservation?.username,
