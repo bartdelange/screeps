@@ -1,0 +1,36 @@
+{
+  "name": "screeps-metric-processor",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/screeps-metric-processor/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "outputPath": "apps/screeps-metric-processor/dist",
+        "main": "apps/screeps-metric-processor/src/index.ts",
+        "tsConfig": "apps/screeps-metric-processor/tsconfig.json",
+        "assets": [
+          "apps/screeps-metric-processor/config/**/*"
+        ]
+      },
+      "outputs": [
+        "{options.outputPath}"
+      ]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "yarn dev",
+        "cwd": "apps/screeps-metric-processor"
+      }
+    },
+    "start": {
+      "executor": "@nx/js:node",
+      "options": {
+        "buildTarget": "screeps-metric-processor:build"
+      }
+    }
+  },
+  "tags": []
+}

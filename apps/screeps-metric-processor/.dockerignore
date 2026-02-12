@@ -1,0 +1,5 @@
+.env
+.idea
+.yarn/cache
+dist
+node_modules

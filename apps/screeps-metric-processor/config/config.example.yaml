@@ -1,0 +1,134 @@
+influx:
+  url: ${INFLUX_URL}
+  org: ${INFLUX_ORG}
+  bucket: ${INFLUX_BUCKET}
+  token: ${INFLUX_TOKEN}
+
+targets:
+  - id: priv-main
+    type: private
+    baseUrl: ${SCREEPS_P_SERVER_URL}
+    auth:
+      email: ${SCREEPS_P_AUTH_EMAIL}
+      password: ${SCREEPS_P_AUTH_PASSWORD}
+    poll:
+      latestSeconds: 15
+      intelSeconds: 120
+    memoryPaths:
+      latest: stats.latest
+      intelRooms: intel.rooms
+
+  - id: mmo
+    type: official
+    baseUrl: https://screeps.com
+    auth:
+      token: ${SCREEPS_MMO_AUTH_EMAIL}
+    poll:
+      latestSeconds: 15
+      intelSeconds: 300
+    memoryPaths:
+      latest: stats
+      intelRooms: intel.rooms
+
+mappings:
+  - id: world
+    source: latest
+    measurement: screeps_world
+    tags:
+      target: ${target}
+    fields:
+      cpu_used: cpu.used
+      cpu_limit: cpu.limit
+      cpu_bucket: cpu.bucket
+      scouting_enabled: world.scouting.enabled
+      scouting_scouts: world.scouting.scouts
+      scouting_owned_ready: world.scouting.ownedReady
+      scouting_owned_total: world.scouting.ownedTotal
+      scouting_targets: world.scouting.targets
+      scouting_queued: world.scouting.queued
+      intel_known: world.intel.known
+      intel_stale: world.intel.stale
+      intel_danger: world.intel.danger
+      game_time: t
+
+  - id: room
+    source: latest
+    measurement: screeps_room
+    tags:
+      target: ${target}
+    iterate:
+      path: rooms
+      tag: room
+    fields:
+      energy_avail: energy.available
+      energy_cap: energy.capacity
+      storage_energy: economy.storageEnergy
+      terminal_energy: economy.terminalEnergy
+      rcl_level: rcl.level
+      rcl_pct: rcl.pct
+      downgrade_ttd: controller.ticksToDowngrade
+      safe_mode_avail: controller.safeModeAvailable
+      safe_mode_cd: controller.safeModeCooldown
+      safe_mode: controller.safeMode
+      hostile_creeps: defense.hostileCreeps
+      hostile_structs: defense.hostileStructures
+      tower_count: defense.towerCount
+      tower_energy: defense.towerEnergy
+      tower_energy_cap: defense.towerEnergyCapacity
+      spawnreq_total: spawnRequests.total
+      spawnreq_pending: spawnRequests.pending
+      plan_spawn_kind: plan.spawn.kind
+      plan_spawn_role: plan.spawn.role
+      plan_spawn_blocked: plan.spawn.blockedByEnergy
+      plan_spawn_required_energy: plan.spawn.requiredEnergy
+      plan_spawn_reason: plan.spawn.reasonCode
+      game_time: $root.t
+
+  - id: room_role
+    source: latest
+    measurement: screeps_room_role
+    tags:
+      target: ${target}
+    iterate:
+      path: rooms
+      tag: room
+      nested:
+        path: roles
+        tag: role
+    fields:
+      current: current
+      target: target
+      game_time: $root.t
+
+  - id: room_spawn
+    source: latest
+    measurement: screeps_room_spawn
+    tags:
+      target: ${target}
+    iterate:
+      path: rooms
+      tag: room
+      nested:
+        path: spawns
+        tag: spawn
+    fields:
+      state: state
+      spawning_remaining: spawningRemaining
+      game_time: $root.t
+
+  - id: intel_room
+    source: intelRooms
+    measurement: screeps_intel_room
+    tags:
+      target: ${target}
+    iterate:
+      tag: room
+    fields:
+      lastSeen: lastSeen
+      dangerUntil: dangerUntil
+      hostileCreeps: hostileCreeps
+      hostileStructures: hostileStructures
+      sources: sources
+      mineral: mineral
+      owner: owner
+      reserver: reserver

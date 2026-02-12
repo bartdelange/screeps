@@ -1,0 +1,56 @@
+{
+  "name": "screeps-bot",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/screeps-bot/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/rollup:rollup",
+      "options": {
+        "main": "apps/screeps-bot/src/main.ts",
+        "outputPath": "apps/screeps-bot/dist",
+        "tsConfig": "apps/screeps-bot/tsconfig.json",
+        "format": [
+          "cjs"
+        ],
+        "compiler": "tsc",
+        "rollupConfig": "apps/screeps-bot/rollup.nx.config.cjs"
+      },
+      "configurations": {
+        "local": {},
+        "main": {},
+        "pserver": {}
+      },
+      "outputs": [
+        "{options.outputPath}"
+      ]
+    },
+    "dev": {
+      "executor": "@nx/rollup:rollup",
+      "options": {
+        "main": "apps/screeps-bot/src/main.ts",
+        "outputPath": "apps/screeps-bot/dist",
+        "tsConfig": "apps/screeps-bot/tsconfig.json",
+        "format": [
+          "cjs"
+        ],
+        "compiler": "tsc",
+        "watch": true,
+        "rollupConfig": "apps/screeps-bot/rollup.nx.config.cjs"
+      },
+      "configurations": {
+        "local": {},
+        "main": {},
+        "pserver": {}
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "yarn format",
+        "cwd": "apps/screeps-bot"
+      }
+    }
+  },
+  "tags": []
+}

@@ -2,7 +2,8 @@ const typescript = require("@rollup/plugin-typescript");
 const terser = require("@rollup/plugin-terser");
 const screeps = require("rollup-plugin-screeps");
 
-const destination = process.env.DEST;
+const nxConfiguration = process.env.NX_TASK_TARGET_CONFIGURATION;
+const destination = process.env.DEST || nxConfiguration || "local";
 const isLocal = !destination || destination === "local";
 const screepsProfiles = require("./screeps.json");
 

@@ -130,6 +130,19 @@ function getStatsLatest(): StatsLatestMemory {
     Memory.stats = stats;
   }
   const stats = Memory.stats as StatsLatestMemory;
+  if (!stats.rooms || typeof stats.rooms !== 'object' || Array.isArray(stats.rooms)) {
+    stats.rooms = emptyStatsLatest().rooms;
+  }
+  if (!stats.world || typeof stats.world !== 'object') {
+    stats.world = emptyStatsLatest().world;
+  } else {
+    if (!stats.world.scouting || typeof stats.world.scouting !== 'object') {
+      stats.world.scouting = emptyStatsLatest().world.scouting;
+    }
+    if (!stats.world.intel || typeof stats.world.intel !== 'object') {
+      stats.world.intel = emptyStatsLatest().world.intel;
+    }
+  }
   stats._planUpdatedAt =
     stats._planUpdatedAt && typeof stats._planUpdatedAt === 'object' ? stats._planUpdatedAt : {};
   return stats;
