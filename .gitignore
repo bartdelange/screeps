@@ -10,3 +10,10 @@ dist
 tmp
 .DS_Store
 .idea
+
+# Local secrets
+**/.env
+**/.env.*
+!**/.env.example
+apps/screeps-bot/screeps.json
+apps/screeps-metric-processor/config/config.yaml
